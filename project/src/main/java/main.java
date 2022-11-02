@@ -1,34 +1,45 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.net.MalformedURLException;
+import java.io.*;
 import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.X509Certificate;
+import javax.json.*;
 import javax.net.ssl.*;
-import org.json.*;
+
+import joseObjects.Nonce;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import services.AcmeFunctions;
+
+import static services.AcmeFunctions.*;
 
 public class main {
+    private static String GET_URL = "https://localhost:14000/dir";
+    private static String NEW_ORDER_URL;
+    private static String NEW_ACCOUNT_URL;
 
-    private static final  String GET_URL = "https://localhost:14000/dir";
+    private static Nonce nonce;
 
-    public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
+
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException {
         initialization();
+        acmeInit();
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
-
+        AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL);
         while (line.equalsIgnoreCase("quit") == false) {
             line = in.readLine();
-            // System.out.println(line); // For debuging purposes only!
-            switch(line) {
+            switch (line) {
                 case "dir":
-                    sendGet();
+                    af.newAccount();
                     break;
-                case "something":
-                    // else
+                case "newOrder":
+                    af.newOrder();
+                    break;
+                case "finalizeOrder":
+                    af.finalizeOrder();
+                    break;
+                case "newAuthz":
+                    af.newAuthz();
                     break;
                 default:
                     System.out.println("command not found, please try again or use \"help\"");
@@ -37,15 +48,17 @@ public class main {
         in.close();
     }
 
-    public static void initialization() throws NoSuchAlgorithmException{
-        TrustManager[] trustAllCerts = new TrustManager[] {
+    public static void initialization() throws NoSuchAlgorithmException {
+        TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
                     }
+
                     public void checkClientTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
+
                     public void checkServerTrusted(
                             java.security.cert.X509Certificate[] certs, String authType) {
                     }
@@ -60,22 +73,30 @@ public class main {
         }
     }
 
-    public static void sendGet() throws IOException, InterruptedException {
+    public static void acmeInit() throws IOException {
         URL url = new URL(GET_URL);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         if (connection != null) {
             try {
-                System.out.println("Response code= " + connection.getResponseCode() + "\n");
-                System.out.println("Printing url content\n");
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String input = br.readLine();
-                System.out.println(input);
-                JSONObject json = new JSONObject(new StringReader(input);
-                System.out.println(json);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
                 br.close();
+                JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
+                JsonObject jObj = jsonReader.readObject();
+                nonce = new Nonce(jObj.getString("newNonce"));
+                NEW_ORDER_URL =  jObj.getString("newOrder");
+                NEW_ACCOUNT_URL =  jObj.getString("newAccount");
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
         }
+    }
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
     }
 }

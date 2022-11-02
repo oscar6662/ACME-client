@@ -1,3 +1,5 @@
+package joseObjects;
+
 public class Jwk {
     public String kty;
     public String crv;

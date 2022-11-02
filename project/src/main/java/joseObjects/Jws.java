@@ -1,3 +1,5 @@
+package joseObjects;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Jws {

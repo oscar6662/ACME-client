@@ -1,2 +1,10 @@
-package joseObjects.jws;public class Identifier {
+package joseObjects.jws;
+
+public class Identifier {
+    String type;
+    String value;
+    public Identifier(String type, String value) {
+        this.type = type;
+        this.value = value;
+    }
 }
