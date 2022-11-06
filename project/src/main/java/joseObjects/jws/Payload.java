@@ -1,6 +1,7 @@
 package joseObjects.jws;
 
 import java.sql.Array;
+import java.util.List;
 
 public class Payload {
     public boolean termsOfServiceAgreed;
@@ -13,9 +14,10 @@ public class Payload {
     public static class PayloadforNewOrder {
         public Identifier[] identifiers;
 
-        public PayloadforNewOrder(String type, String value) {
-            this.identifiers = new Identifier[1];
-            this.identifiers[0] = new Identifier(type, value);
+        public PayloadforNewOrder(List<String> identifiers) {
+            this.identifiers = new Identifier[identifiers.size()];
+            for(int i = 0; i < identifiers.size(); i++)
+                this.identifiers[0] = new Identifier("dns", identifiers.get(i));
         }
     }
     public static class PayloadToFinalizeOrder {

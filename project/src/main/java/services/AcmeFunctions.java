@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.List;
 
 import static utils.Utils.*;
 import joseObjects.Nonce;
@@ -73,14 +74,14 @@ public class AcmeFunctions {
             rs.sendPost(NEW_ACCOUNT_URL, jwsString, nonce, ks, "newAccount");
         }
 
-    public void newOrder() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException {
+    public void newOrder(List<String> identifiers) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException {
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), NEW_ORDER_URL);
         byte[] by = gson.toJson(p).getBytes("UTF-8");
 
-        Payload.PayloadforNewOrder pn = new Payload.PayloadforNewOrder("dns", "example.org");
+        Payload.PayloadforNewOrder pn = new Payload.PayloadforNewOrder(identifiers);
         byte[] bz = gson.toJson(pn).getBytes("UTF-8");
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));

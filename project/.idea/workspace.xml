@@ -5,35 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__dnsjava_dnsjava_3_5_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_bouncycastle_bcpkix_jdk18on_1_71.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_bouncycastle_bcprov_jdk18on_1_72.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_bouncycastle_bcutil_jdk18on_1_71.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_2_0_3.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/services/Dns01Challenge.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/services/DnsServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/acme.iml" beforeDir="false" afterPath="$PROJECT_DIR$/acme.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/joseObjects/jws/Payload.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/joseObjects/jws/Payload.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/requestSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/requestSender.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/Challenge.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/Challenge.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/Jwk.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/Jwk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/Jws.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/Jws.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/KeyStuff.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/KeyStuff.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/Nonce.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/Nonce.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/jws/Identifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/jws/Identifier.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload$PayloadToFinalizeOrder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload$PayloadToFinalizeOrder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload$PayloadforNewOrder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload$PayloadforNewOrder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/jws/Payload.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/joseObjects/jws/Protected.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/joseObjects/jws/Protected.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/main$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/services/AcmeFunctions.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/AcmeFunctions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/services/requestSender.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/requestSender.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Utils.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +58,7 @@
     <configuration name="main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main" />
       <module name="acme" />
+      <option name="PROGRAM_PARAMETERS" value="dns01 --dir https://example.com/dir --record 1.2.3.4 --domain netsec.ethz.ch --domain syssec.ethz.ch" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

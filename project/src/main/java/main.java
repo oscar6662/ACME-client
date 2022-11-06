@@ -9,6 +9,7 @@ import joseObjects.Nonce;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import services.AcmeFunctions;
+import services.ArgumentParser;
 import services.DnsServer;
 
 public class main {
@@ -22,18 +23,23 @@ public class main {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException {
         initialization();
-        acmeInit();
+        ArgumentParser ap = new ArgumentParser(args);
+        acmeInit(ap.ACMEServerDirectory);
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
         AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL);
-        while (line.equalsIgnoreCase("quit") == false) {
+        af.newAccount();
+        af.newOrder(ap.domainList);
+        af.newAuthz();
+        af.dns01();
+        while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {
                 case "dir":
                     af.newAccount();
                     break;
                 case "newOrder":
-                    af.newOrder();
+                    af.newOrder(ap.domainList);
                     break;
                 case "finalizeOrder":
                     af.finalizeOrder();
@@ -76,8 +82,8 @@ public class main {
         }
     }
 
-    public static void acmeInit() throws IOException {
-        URL url = new URL(GET_URL);
+    public static void acmeInit(String getUrl) throws IOException {
+        URL url = new URL(getUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         if (connection != null) {
             try {
