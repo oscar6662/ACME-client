@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/joseObjects/jws/Payload.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/joseObjects/jws/Payload.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run" beforeDir="false" afterPath="$PROJECT_DIR$/run" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
