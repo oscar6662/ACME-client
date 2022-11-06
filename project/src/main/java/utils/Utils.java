@@ -5,6 +5,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public class Utils {
@@ -78,4 +80,15 @@ public class Utils {
         g.initialize(ecSpec, new SecureRandom());
         return g.generateKeyPair();
     }
+    public static byte[] sha256hash(String z) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(z.getBytes(StandardCharsets.UTF_8));
+            return md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println(ex);
+            return null;
+        }
+    }
+
 }

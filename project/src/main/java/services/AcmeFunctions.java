@@ -110,9 +110,6 @@ public class AcmeFunctions {
 
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getAuthz(), jwsString, nonce, ks, "newAuthz");
-        dns01();
-        http01();
-        tls01();
     }
     public void dns01() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
@@ -130,6 +127,7 @@ public class AcmeFunctions {
 
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getDns01().getUrl(), jwsString, nonce, ks, "dns01");
+
     }
     public void http01() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");

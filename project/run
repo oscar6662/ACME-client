@@ -2,5 +2,5 @@
 DIRECTORY=$(dirname "$0")
 echo "Changing to ${DIRECTORY}"
 cd  "$DIRECTORY" || exit 1
-
 echo "Run your project here."
+mvn exec:java -Dexec.mainClass="main" -f / -Dexec.args="$*"

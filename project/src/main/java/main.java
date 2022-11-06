@@ -1,5 +1,5 @@
 import java.io.*;
-import java.net.URL;
+import java.net.*;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import javax.json.*;
@@ -9,8 +9,7 @@ import joseObjects.Nonce;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import services.AcmeFunctions;
-
-import static services.AcmeFunctions.*;
+import services.DnsServer;
 
 public class main {
     private static String GET_URL = "https://localhost:14000/dir";
@@ -18,6 +17,7 @@ public class main {
     private static String NEW_ACCOUNT_URL;
 
     private static Nonce nonce;
+    static DnsServer server;
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException {
@@ -41,6 +41,9 @@ public class main {
                 case "newAuthz":
                     af.newAuthz();
                     break;
+                case "dns01":
+                    af.dns01();
+                    break;
                 default:
                     System.out.println("command not found, please try again or use \"help\"");
             }
@@ -48,7 +51,7 @@ public class main {
         in.close();
     }
 
-    public static void initialization() throws NoSuchAlgorithmException {
+    public static void initialization() throws NoSuchAlgorithmException, UnknownHostException, SocketException {
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {

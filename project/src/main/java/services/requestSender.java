@@ -14,8 +14,10 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 
 public class requestSender {
+    Dns01Challenge dc = new Dns01Challenge();
     public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation) throws IOException {
         URL url = new URL(getUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -23,7 +25,6 @@ public class requestSender {
         connection.setRequestProperty("Content-Type", "application/jose+json");
         connection.setRequestProperty("Accept-Charset", "utf-8");
         connection.setDoOutput(true);
-        System.out.println(jws);
         byte[] outputData = jws.getBytes(StandardCharsets.UTF_8);
         connection.setFixedLengthStreamingMode(outputData.length);
         connection.connect();
@@ -66,6 +67,7 @@ public class requestSender {
                                 break;
                             case "\"dns-01\"":
                                 ks.setDns01(challenge);
+                                dc.startDnsChallenge(ks);
                                 break;
                             default:
                                 System.out.println("shit challenge");
@@ -74,7 +76,7 @@ public class requestSender {
                 // JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
                 // JsonObject jObj = jsonReader.readObject();
 
-            } catch (IOException ioException) {
+            } catch (IOException | NoSuchAlgorithmException ioException) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
