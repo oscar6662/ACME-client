@@ -1,5 +1,6 @@
 #!/bin/bash
 
 echo "Compile your project here"
-mvn project/ package
+ls
+mvn -f project/ package
 
