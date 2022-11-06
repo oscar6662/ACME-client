@@ -3,4 +3,4 @@ DIRECTORY=$(dirname "$0")
 echo "Changing to ${DIRECTORY}"
 cd  "$DIRECTORY" || exit 1
 echo "Run your project here."
-mvn exec:java -Dexec.mainClass="main" / -Dexec.args="$*"
+mvn exec:java -Dexec.mainClass="groupId.main" / -Dexec.args="$*"
