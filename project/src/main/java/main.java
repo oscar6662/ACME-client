@@ -12,11 +12,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import services.AcmeFunctions;
 import services.ArgumentParser;
 import services.DnsServer;
+import services.ShutdownHttpServer;
 
 public class main {
     private static String GET_URL = "https://localhost:14000/dir";
     private static String NEW_ORDER_URL;
     private static String NEW_ACCOUNT_URL;
+    private static ShutdownHttpServer shutdownHttpServer;
 
     private static Nonce nonce;
     static DnsServer server;
@@ -32,7 +34,8 @@ public class main {
         af.newAccount();
         af.newOrder(ap.domainList);
         af.newAuthz();
-        af.dns01();
+        if (ap.challengeType.equals("dns01")) af.dns01();
+        else if (ap.challengeType.equals("http01")) af.http01();
         int counter = 0;
         while (!af.getKs().isReady() && counter <10) {
             Thread.sleep(1000);
@@ -99,6 +102,7 @@ public class main {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            shutdownHttpServer = new ShutdownHttpServer(5003);
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }

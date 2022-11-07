@@ -24,8 +24,10 @@ import java.util.Scanner;
 
 public class requestSender {
     Dns01Challenge dc;
+    ChallengeHttpServer httpc;
     public requestSender(String DNSServerAddress) {
         dc = new Dns01Challenge(DNSServerAddress);
+        httpc = new ChallengeHttpServer(5002);
     }
     public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation) throws IOException {
         URL url = new URL(getUrl);
@@ -68,7 +70,6 @@ public class requestSender {
                 }
                 if (motivation.equals("cert")) {
                     CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                    System.out.println(firstCertificate);
                     Certificate[] certificates = new Certificate[2];
                     certificates[0] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(firstCertificate.toString())));
                     certificates[1] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(secondCertificate.toString())));
@@ -116,6 +117,7 @@ public class requestSender {
                         switch (challengeType) {
                             case "\"http-01\"":
                                 ks.setHttp01(challenge);
+                                httpc.startHttpChallenge(ks, httpc);
                                 break;
                             case "\"tls-alpn-01\"":
                                 ks.setTlsAlpn01(challenge);

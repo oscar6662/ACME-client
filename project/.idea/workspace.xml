@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/services/CertificateHTTPSServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/services/ChallengeHttpServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/services/ShutdownHttpServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/acme.iml" beforeDir="false" afterPath="$PROJECT_DIR$/acme.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/joseObjects/KeyStuff.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/joseObjects/KeyStuff.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/services/requestSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/requestSender.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,7 +56,7 @@
     <configuration name="main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main" />
       <module name="acme" />
-      <option name="PROGRAM_PARAMETERS" value="dns01 --dir https://localhost:14000/dir --record 1.2.3.4 --domain netsec.ethz.ch" />
+      <option name="PROGRAM_PARAMETERS" value="http01 --dir https://localhost:14000/dir --record 1.2.3.4 --domain netsec.ethz.ch" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
