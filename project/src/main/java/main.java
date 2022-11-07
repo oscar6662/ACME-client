@@ -21,18 +21,24 @@ public class main {
     static DnsServer server;
 
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException, InterruptedException {
         initialization();
         ArgumentParser ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
         AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress);
-        af.newAccount();
+        /*af.newAccount();
         af.newOrder(ap.domainList);
         af.newAuthz();
         af.dns01();
-        af.finalizeOrder(ap.domainList);
+        int counter = 0;
+        while (af.getKs().isAuthStatus() && counter <10) {
+            System.out.println("dns working on it");
+            Thread.sleep(300);
+            af.newAuthz();
+        }
+        af.finalizeOrder(ap.domainList);*/
         while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {
@@ -50,6 +56,12 @@ public class main {
                     break;
                 case "dns01":
                     af.dns01();
+                    break;
+                case "sts":
+                    af.checkStatus();
+                    break;
+                case "cert":
+                    af.downloadCertificate();
                     break;
                 default:
                     System.out.println("command not found, please try again or use \"help\"");

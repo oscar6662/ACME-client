@@ -46,9 +46,13 @@ public class AcmeFunctions {
         rs = new requestSender(DNSServerAddress);
         ks = new KeyStuff();
         gson = new Gson();
-
     }
-        public void newAccount() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
+
+    public KeyStuff getKs() {
+        return ks;
+    }
+
+    public void newAccount() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException
         {
             Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
             ecdsaSign.initSign(ks.getPair().getPrivate());
@@ -169,14 +173,14 @@ public class AcmeFunctions {
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());
         GeneralName[] gns = new GeneralName[1];
-        gns[0] = new GeneralName(GeneralName.dNSName, "example.org");
+        gns[0] = new GeneralName(GeneralName.dNSName, identifiers.get(0).trim().toLowerCase());
         GeneralNames subjectAltName = new GeneralNames(gns);
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getFinalizeUrl());
         byte[] by = gson.toJson(p).getBytes("UTF-8");
         X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
         for(int i = 0; i<identifiers.size(); i++)
-            namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifiers.get(i).trim()).toLowerCase());
+            namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifiers.get(i).trim().toLowerCase()));
         PKCS10CertificationRequestBuilder p10Builder =
                 new JcaPKCS10CertificationRequestBuilder(namebuilder.build(), ks2.getPair().getPublic());
         ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();
@@ -200,6 +204,39 @@ public class AcmeFunctions {
 
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getFinalizeUrl(), jwsString, nonce, ks, "finalizeOrder");
+    }
+    public void checkStatus() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
+        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
+        ecdsaSign.initSign(ks.getPair().getPrivate());
 
+        Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getSecondLocation());
+        byte[] by = gson.toJson(p).getBytes("UTF-8");
+
+        String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
+        ecdsaSign.update(baba.getBytes("UTF-8"));
+
+        byte[] signature = ecdsaSign.sign();
+        byte[] formatsign = convertDerToConcatenated(signature, 16);
+        Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),"", Base64.encodeBase64URLSafeString(formatsign));
+
+        String jwsString = gson.toJson(jws);
+        rs.sendPost(ks.getSecondLocation(), jwsString, nonce, ks, "statusCheck");
+    }
+    public void downloadCertificate() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException {
+        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
+        ecdsaSign.initSign(ks.getPair().getPrivate());
+
+        Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getCertificateUrl());
+        byte[] by = gson.toJson(p).getBytes("UTF-8");
+
+        String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
+        ecdsaSign.update(baba.getBytes("UTF-8"));
+
+        byte[] signature = ecdsaSign.sign();
+        byte[] formatsign = convertDerToConcatenated(signature, 16);
+        Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),"", Base64.encodeBase64URLSafeString(formatsign));
+
+        String jwsString = gson.toJson(jws);
+        rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
 }

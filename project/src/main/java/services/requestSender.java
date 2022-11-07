@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
 public class requestSender {
     Dns01Challenge dc;
@@ -38,14 +39,26 @@ public class requestSender {
         if (connection != null) {
             try {
                 nonce.setNonce(connection.getHeaderField("Replay-Nonce"));
-                if (motivation.equals("newAccount")) ks.setLocation(connection.getHeaderField("Location"));
+                if (motivation.equals("newAccount"))
+                    ks.setLocation(connection.getHeaderField("Location"));
 
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
+                StringBuilder certificate = new StringBuilder();
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
-                    System.out.println(line);
+                    if (motivation.equals("cert")){
+                            if (!line.equals("-----BEGIN CERTIFICATE-----") && !line.equals("-----END CERTIFICATE-----") ) {
+                                certificate.append(line);
+                            }
+                            if (line.equals("-----END CERTIFICATE-----"))
+                            {
+                                System.out.println("certificate gets printed");
+                                ks.setCertificate(certificate.toString());
+                                break;
+                            }
+                    }
                 }
                 br.close();
                 if (motivation.equals("newOrder")) {
@@ -53,10 +66,26 @@ public class requestSender {
                     JsonObject jObj = jsonReader.readObject();
                     ks.setFinalizeUrl(jObj.getString("finalize"));
                     ks.setAuthz(jObj.getJsonArray("authorizations").getString(0));
+                    ks.setSecondLocation(connection.getHeaderField("Location"));
                 }
+                if (motivation.equals("finalizeOrder")) {
+                    JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
+                    JsonObject jObj = jsonReader.readObject();
+                    ks.setFinalizeUrl(jObj.getString("finalize"));
+
+                }
+                if (motivation.equals("statusCheck")) {
+                    JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
+                    JsonObject jObj = jsonReader.readObject();
+                    ks.setFinalizeUrl(jObj.getString("finalize"));
+                    if (!jObj.getString("certificate").isBlank())
+                        ks.setCertificateUrl(jObj.getString("certificate"));
+                }
+
                 if (motivation.equals("newAuthz")) {
                     com.google.gson.JsonObject jObj = new JsonParser().parse(new StringReader(sb.toString())).getAsJsonObject();
                     Gson gson = new Gson();
+                    ks.setAuthStatus(!jObj.get("status").toString().equals("pending"));
                     JsonArray ja = jObj.getAsJsonArray("challenges");
                     for (int i = 0; i <ja.size(); i++) {
                         String challengeType = ja.get(i).getAsJsonObject().get("type").toString();

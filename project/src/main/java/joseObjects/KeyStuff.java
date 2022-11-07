@@ -15,6 +15,11 @@ public class KeyStuff {
     private Challenge tlsAlpn01;
     private Challenge dns01;
     private Challenge http01;
+    private String certificateUrl;
+    private boolean authStatus;
+    private String secondLocation;
+    private String certificate;
+
     public KeyStuff() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
          pair = GenerateKeys();
     }
@@ -69,5 +74,37 @@ public class KeyStuff {
 
     public void setTlsAlpn01(Challenge tlsAlpn01) {
         this.tlsAlpn01 = tlsAlpn01;
+    }
+
+    public void setCertificateUrl(String certificateUrl) {
+        this.certificateUrl = certificateUrl;
+    }
+
+    public String getCertificateUrl() {
+        return certificateUrl;
+    }
+
+    public boolean isAuthStatus() {
+        return authStatus;
+    }
+
+    public void setAuthStatus(boolean authStatus) {
+        this.authStatus = authStatus;
+    }
+
+    public String getSecondLocation() {
+        return secondLocation;
+    }
+
+    public void setSecondLocation(String secondLocation) {
+        this.secondLocation = secondLocation;
+    }
+
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
+
+    public String getCertificate() {
+        return certificate;
     }
 }
