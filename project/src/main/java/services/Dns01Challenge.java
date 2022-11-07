@@ -9,15 +9,18 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import services.DnsServer;
 import static utils.Utils.sha256hash;
 
 
 public class Dns01Challenge {
+    private static String DNSServerAddress;
+    public Dns01Challenge(String DNSServerAddress) {
+        Dns01Challenge.DNSServerAddress = DNSServerAddress;
+    }
     public static void startDnsChallenge(KeyStuff ks) throws NoSuchAlgorithmException, SocketException {
         PublicKey pk = ks.getPair().getPublic();
         String toEncode = ks.getDns01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        DnsServer server = new DnsServer(10053);
+        DnsServer server = new DnsServer(10053, DNSServerAddress);
         server.setTextChallenge(Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
         server.start();
     }

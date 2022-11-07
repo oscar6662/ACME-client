@@ -17,7 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 public class requestSender {
-    Dns01Challenge dc = new Dns01Challenge();
+    Dns01Challenge dc;
+    public requestSender(String DNSServerAddress) {
+        dc = new Dns01Challenge(DNSServerAddress);
+    }
     public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation) throws IOException {
         URL url = new URL(getUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();

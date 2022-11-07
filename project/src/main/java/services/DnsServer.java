@@ -13,14 +13,13 @@ import java.util.Base64;
 
 public class DnsServer extends Thread{
     private final DatagramSocket socket;
-    //private final String resultForAQuery;
+    private final String resultForAQuery;
     private String textChallenge;
     private volatile boolean running = true;
 
-    public DnsServer(int port) throws SocketException {
+    public DnsServer(int port, String DNSServerAddress) throws SocketException {
         this.socket = new DatagramSocket(new InetSocketAddress(10053));
-        //resultForAQuery = ArgumentParser.getInstance().getDnsRecord();
-        setDaemon(true);
+        resultForAQuery = DNSServerAddress;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class DnsServer extends Thread{
                 response.setHeader(header);
                 response.addRecord(request.getQuestion(), Section.QUESTION);
                 if (type == Type.A) {
-                    //  response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 30, resultForAQuery, Name.root), Section.ANSWER);
+                    response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 30, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 30, textChallenge, Name.root), Section.ANSWER);
                     //App.beginPolling();

@@ -39,11 +39,11 @@ public class AcmeFunctions {
     private requestSender rs;
     private KeyStuff ks;
     private Gson gson;
-    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
         NEW_ORDER_URL = newOrderUrl;
-        rs = new requestSender();
+        rs = new requestSender(DNSServerAddress);
         ks = new KeyStuff();
         gson = new Gson();
 

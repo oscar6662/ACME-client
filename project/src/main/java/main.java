@@ -27,11 +27,12 @@ public class main {
         acmeInit(ap.ACMEServerDirectory);
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
-        AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL);
+        AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress);
         af.newAccount();
         af.newOrder(ap.domainList);
         af.newAuthz();
         af.dns01();
+        af.finalizeOrder();
         while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {
