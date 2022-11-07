@@ -164,7 +164,7 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getTlsAlpn01().getUrl(), jwsString, nonce, ks, "tls01");
     }
-    public void finalizeOrder() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, OperatorCreationException, SignatureException, InvalidAlgorithmParameterException {
+    public void finalizeOrder(List<String> identifiers) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, OperatorCreationException, SignatureException, InvalidAlgorithmParameterException {
         KeyStuff ks2 = new KeyStuff();
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());
@@ -175,7 +175,8 @@ public class AcmeFunctions {
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getFinalizeUrl());
         byte[] by = gson.toJson(p).getBytes("UTF-8");
         X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
-        namebuilder.addRDN(BCStyle.CN, IDN.toASCII("example.org".trim()).toLowerCase());
+        for(int i = 0; i<identifiers.size(); i++)
+            namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifiers.get(i).trim()).toLowerCase());
         PKCS10CertificationRequestBuilder p10Builder =
                 new JcaPKCS10CertificationRequestBuilder(namebuilder.build(), ks2.getPair().getPublic());
         ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();

@@ -32,7 +32,7 @@ public class main {
         af.newOrder(ap.domainList);
         af.newAuthz();
         af.dns01();
-        af.finalizeOrder();
+        af.finalizeOrder(ap.domainList);
         while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {
@@ -43,7 +43,7 @@ public class main {
                     af.newOrder(ap.domainList);
                     break;
                 case "finalizeOrder":
-                    af.finalizeOrder();
+                    af.finalizeOrder(ap.domainList);
                     break;
                 case "newAuthz":
                     af.newAuthz();
