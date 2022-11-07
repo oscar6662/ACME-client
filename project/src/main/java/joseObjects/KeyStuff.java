@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.cert.Certificate;
 
 import static utils.Utils.GenerateKeys;
 
@@ -16,9 +17,10 @@ public class KeyStuff {
     private Challenge dns01;
     private Challenge http01;
     private String certificateUrl;
-    private boolean authStatus;
+    private boolean authStatus = false;
     private String secondLocation;
-    private String certificate;
+    private Certificate[] certificate;
+    private boolean ready = false;
 
     public KeyStuff() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
          pair = GenerateKeys();
@@ -100,11 +102,19 @@ public class KeyStuff {
         this.secondLocation = secondLocation;
     }
 
-    public void setCertificate(String certificate) {
+    public void setCertificate(Certificate[] certificate) {
         this.certificate = certificate;
     }
 
-    public String getCertificate() {
+    public Certificate[] getCertificate() {
         return certificate;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 }

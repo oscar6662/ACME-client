@@ -20,5 +20,6 @@
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk18on:1.72" level="project" />
     <orderEntry type="library" name="Maven: dnsjava:dnsjava:3.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.nanohttpd:nanohttpd:2.3.1" level="project" />
   </component>
 </module>

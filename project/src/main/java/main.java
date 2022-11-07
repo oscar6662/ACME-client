@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.security.*;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import javax.json.*;
 import javax.net.ssl.*;
@@ -21,24 +22,32 @@ public class main {
     static DnsServer server;
 
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException, InterruptedException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException {
         initialization();
         ArgumentParser ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
         AcmeFunctions af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress);
-        /*af.newAccount();
+        af.newAccount();
         af.newOrder(ap.domainList);
         af.newAuthz();
         af.dns01();
         int counter = 0;
-        while (af.getKs().isAuthStatus() && counter <10) {
-            System.out.println("dns working on it");
-            Thread.sleep(300);
-            af.newAuthz();
+        while (!af.getKs().isReady() && counter <10) {
+            Thread.sleep(1000);
+            af.checkStatus();
+            counter++;
         }
-        af.finalizeOrder(ap.domainList);*/
+        af.finalizeOrder(ap.domainList);
+        counter = 0;
+        while (!af.getKs().isAuthStatus() && counter <10) {
+            Thread.sleep(1000);
+            af.checkStatus();
+            counter++;
+        }
+        af.downloadCertificate();
+        af.createServer();
         while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {

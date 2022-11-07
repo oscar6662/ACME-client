@@ -1,6 +1,7 @@
 package services;
 
 import com.google.gson.Gson;
+import fi.iki.elonen.NanoHTTPD;
 import joseObjects.Jwk;
 import joseObjects.Jws;
 import joseObjects.KeyStuff;
@@ -27,10 +28,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 
 import static utils.Utils.*;
 import joseObjects.Nonce;
+
+import javax.net.ssl.KeyManagerFactory;
 
 public class AcmeFunctions {
     private Nonce nonce;
@@ -239,4 +244,16 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
+    public void createServer() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        CertificateHTTPSServer certificateHTTPSServer = new CertificateHTTPSServer(5001);
+        KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+        store.load(null, "something".toCharArray());
+        store.setKeyEntry("main", ks.getPair().getPrivate(), "something".toCharArray(), ks.getCertificate());
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(store, "something".toCharArray());
+        certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
+
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        new Thread(certificateHTTPSServer).start();
+  }
 }
