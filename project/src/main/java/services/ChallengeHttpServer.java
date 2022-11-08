@@ -22,7 +22,6 @@ public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
     public void setTextChallenge(String textChallenge) {
         this.textChallenge = textChallenge;
     }
-
     @Override
     public void run() {
         try {
@@ -35,24 +34,8 @@ public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
     public Response serve(IHTTPSession session) {
         System.out.println("response:");
         Response r = newFixedLengthResponse(textChallenge);
-        System.out.println(r.toString());
+        System.out.println(r);
         r.addHeader("Content-Type", "application/octet-stream");
         return r;
-    }
-    public void startHttpChallenge(KeyStuff ks, ChallengeHttpServer c) throws NoSuchAlgorithmException, IOException {
-        PublicKey pk = ks.getPair().getPublic();
-        String toEncode = ks.getHttp01().getToken()+"."+ Base64.encodeBase64URLSafeString(thumbprint(pk));
-        c.setTextChallenge(Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
-        c.start();
-    }
-    public static byte[] thumbprint(PublicKey pk) throws NoSuchAlgorithmException {
-        String template = "{\"crv\":\"%s\",\"kty\":\"EC\",\"x\":\"%s\",\"y\":\"%s\"}";
-        Object crv = "P-256";
-        Object x = Base64.encodeBase64URLSafeString(((ECPublicKey) pk).getQ().getAffineXCoord().getEncoded());
-        Object y = Base64.encodeBase64URLSafeString(((ECPublicKey) pk).getQ().getAffineYCoord().getEncoded());
-        String s =  String.format(template, crv, x, y);
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(s.getBytes(StandardCharsets.UTF_8));
-        return md.digest();
     }
 }

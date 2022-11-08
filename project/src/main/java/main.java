@@ -91,28 +91,26 @@ public class main {
 
     public static void initialization() throws NoSuchAlgorithmException, IOException, KeyStoreException, KeyManagementException, CertificateException {
         if (DEV) {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new X509Certificate[0];
-                        }
-
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-                    }
-            };
-            try {
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
+            List<String> strings;
+            strings = Files.readAllLines(Path.of("/Users/oscar6662/Documents/Skóli/eth-22/networkSecurity/pebble/test/certs/pebble.minica.pem"));
+            strings.remove(0);
+            strings.remove(strings.size() - 1);
+            String certificateString =  String.join("", strings);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            Certificate certificate;
+            try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.getDecoder().decode(certificateString))) {
+                certificate = certificateFactory.generateCertificate(certificateStream);
             }
+            KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] password = "password".toCharArray();
+            store.load(null, password);
+            store.setCertificateEntry("pebble", certificate);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(store);
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagers, null);
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         } else {
             List<String> strings;
             strings = Files.readAllLines(Path.of("pebble.minica.pem"));

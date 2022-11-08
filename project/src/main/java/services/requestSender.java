@@ -24,10 +24,10 @@ import java.util.Scanner;
 
 public class requestSender {
     Dns01Challenge dc;
-    ChallengeHttpServer httpc;
+    Http01Challenge httpc;
     public requestSender(String DNSServerAddress) {
         dc = new Dns01Challenge(DNSServerAddress);
-        httpc = new ChallengeHttpServer(5002);
+        httpc = new Http01Challenge();
     }
     public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation) throws IOException {
         URL url = new URL(getUrl);
@@ -116,8 +116,9 @@ public class requestSender {
                         Challenge challenge = gson.fromJson(ja.get(i).toString(), Challenge.class);
                         switch (challengeType) {
                             case "\"http-01\"":
+                                System.out.println(challenge.getType()+challenge.getToken());
                                 ks.setHttp01(challenge);
-                                httpc.startHttpChallenge(ks, httpc);
+                                httpc.startHttpChallenge(ks);
                                 break;
                             case "\"tls-alpn-01\"":
                                 ks.setTlsAlpn01(challenge);
