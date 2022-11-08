@@ -21,7 +21,7 @@ import services.DnsServer;
 import services.ShutdownHttpServer;
 
 public class main {
-    private static final boolean DEV = false;
+    private static final boolean DEV = true;
     private static String GET_URL = "https://localhost:14000/dir";
     private static String NEW_ORDER_URL;
     private static String NEW_ACCOUNT_URL;
@@ -120,7 +120,7 @@ public class main {
             strings.remove(strings.size() - 1);
             String certificateString =  String.join("", strings);
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            Certificate certificate = null;
+            Certificate certificate;
             try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.getDecoder().decode(certificateString))) {
                 certificate = certificateFactory.generateCertificate(certificateStream);
             }
@@ -136,7 +136,7 @@ public class main {
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, null);
-            SSLContext.setDefault(sslContext);
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         }
         shutdownHttpServer = new ShutdownHttpServer(5003);
 

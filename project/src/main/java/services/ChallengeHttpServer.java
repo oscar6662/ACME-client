@@ -34,6 +34,8 @@ public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
     @Override
     public Response serve(IHTTPSession session) {
         Response r = newFixedLengthResponse(textChallenge);
+        System.out.println("response:");
+        System.out.println(r);
         r.addHeader("Content-Type", "application/octet-stream");
         return r;
     }
