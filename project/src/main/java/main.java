@@ -1,8 +1,14 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
+import java.util.List;
 import javax.json.*;
 import javax.net.ssl.*;
 
@@ -15,6 +21,7 @@ import services.DnsServer;
 import services.ShutdownHttpServer;
 
 public class main {
+    private static final boolean DEV = false;
     private static String GET_URL = "https://localhost:14000/dir";
     private static String NEW_ORDER_URL;
     private static String NEW_ACCOUNT_URL;
@@ -24,7 +31,7 @@ public class main {
     static DnsServer server;
 
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException, InvalidKeyException, SignatureException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException, KeyManagementException {
         initialization();
         ArgumentParser ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
@@ -82,30 +89,57 @@ public class main {
         in.close();
     }
 
-    public static void initialization() throws NoSuchAlgorithmException, UnknownHostException, SocketException {
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
+    public static void initialization() throws NoSuchAlgorithmException, IOException, KeyStoreException, KeyManagementException, CertificateException {
+        if (DEV) {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
 
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
 
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
                     }
-                }
-        };
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            shutdownHttpServer = new ShutdownHttpServer(5003);
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
+            };
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+        } else {
+            List<String> strings;
+            strings = Files.readAllLines(Path.of("pebble.minica.pem"));
+            strings.remove(0);
+            strings.remove(strings.size() - 1);
+            String certificateString =  String.join("", strings);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            Certificate certificate = null;
+            try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.getDecoder().decode(certificateString))) {
+                certificate = certificateFactory.generateCertificate(certificateStream);
+            }
+            KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] password = "password".toCharArray();
+            store.load(null, password);
+            store.setCertificateEntry("pebble", certificate);
+
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(store);
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagers, null);
+            SSLContext.setDefault(sslContext);
         }
+        shutdownHttpServer = new ShutdownHttpServer(5003);
+
     }
 
     public static void acmeInit(String getUrl) throws IOException {
