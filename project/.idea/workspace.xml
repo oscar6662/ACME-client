@@ -54,7 +54,7 @@
     <configuration name="main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main" />
       <module name="acme" />
-      <option name="PROGRAM_PARAMETERS" value="http01 --dir https://localhost:14000/dir --record 1.2.3.4 --domain netsec.ethz.ch" />
+      <option name="PROGRAM_PARAMETERS" value="http01 --dir https://localhost:14000/dir --record 127.0.0.1 --domain netsec.ethz.ch" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

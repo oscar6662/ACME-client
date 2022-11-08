@@ -128,12 +128,9 @@ public class main {
             char[] password = "password".toCharArray();
             store.load(null, password);
             store.setCertificateEntry("pebble", certificate);
-
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(store);
             TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-
-
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
