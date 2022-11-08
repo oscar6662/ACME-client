@@ -17,7 +17,7 @@ public class Http01Challenge {
 
     public static void startHttpChallenge(KeyStuff ks) throws NoSuchAlgorithmException, IOException {
         PublicKey pk = ks.getPair().getPublic();
-        String toEncode = ks.getDns01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
+        String toEncode = ks.getHttp01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
         ChallengeHttpServer server = new ChallengeHttpServer(5002);
         server.setTextChallenge(Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
         server.start();
