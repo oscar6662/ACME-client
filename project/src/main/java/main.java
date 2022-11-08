@@ -57,7 +57,7 @@ public class main {
             counter++;
         }
         af.downloadCertificate();
-        af.createServer();
+        af.createServer(ap.shouldRevoke);
         while (!line.equalsIgnoreCase("quit")) {
             line = in.readLine();
             switch (line) {

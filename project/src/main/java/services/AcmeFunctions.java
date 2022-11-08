@@ -244,7 +244,7 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
-    public void createServer() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
         CertificateHTTPSServer certificateHTTPSServer = new CertificateHTTPSServer(5001);
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
         store.load(null, "something".toCharArray());
@@ -252,8 +252,7 @@ public class AcmeFunctions {
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, "something".toCharArray());
         certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
-
-        CyclicBarrier barrier = new CyclicBarrier(2);
-        new Thread(certificateHTTPSServer).start();
+        certificateHTTPSServer.start();
+        if(shouldRevoke) certificateHTTPSServer.stop();
   }
 }
