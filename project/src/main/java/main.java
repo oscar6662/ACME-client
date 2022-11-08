@@ -21,7 +21,7 @@ import services.DnsServer;
 import services.ShutdownHttpServer;
 
 public class main {
-    private static final boolean DEV = false;
+    private static final boolean DEV = true;
     private static String GET_URL = "https://localhost:14000/dir";
     private static String NEW_ORDER_URL;
     private static String NEW_ACCOUNT_URL;

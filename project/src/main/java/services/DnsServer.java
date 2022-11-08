@@ -39,7 +39,7 @@ public class DnsServer extends Thread{
                 response.setHeader(header);
                 response.addRecord(request.getQuestion(), Section.QUESTION);
                 if (type == Type.A) {
-                    response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, "host.docker.internal", Name.root), Section.ANSWER);
+                    response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge, Name.root), Section.ANSWER);
                 }
