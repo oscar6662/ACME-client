@@ -32,7 +32,6 @@ public class main {
         initialization();
         ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
-
         af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress, ap.challengeType);
         getTheCertificate(ap, af);
     }

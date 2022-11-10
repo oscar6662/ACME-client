@@ -43,6 +43,7 @@ public class AcmeFunctions {
     private KeyStuff ks;
     private Gson gson;
     private String challengeType;
+    private CertificateHTTPSServer certificateHTTPSServer;
     public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, SocketException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
@@ -51,6 +52,7 @@ public class AcmeFunctions {
         ks = new KeyStuff();
         gson = new Gson();
         this.challengeType =challengeType;
+        new ShutdownHttpServer(5003, rs, certificateHTTPSServer);
     }
 
     public KeyStuff getKs() {
@@ -245,7 +247,7 @@ public class AcmeFunctions {
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
     public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        CertificateHTTPSServer certificateHTTPSServer = new CertificateHTTPSServer(5001);
+         certificateHTTPSServer = new CertificateHTTPSServer(5001);
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
         store.load(null, "something".toCharArray());
         store.setKeyEntry("main", ks.getPair().getPrivate(), "something".toCharArray(), ks.getCertificate());
@@ -254,11 +256,10 @@ public class AcmeFunctions {
         certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
         certificateHTTPSServer.start();
         if(shouldRevoke){
-            certificateHTTPSServer.stop();
-            if (challengeType.equals("dns01"))
-                rs.dc.shutTheServerDown();
-            else if (challengeType.equals("http01"))
-                rs.httpc.shutTheServerDown();
+            revokeCert();
         }
+  }
+  public void revokeCert() {
+
   }
 }

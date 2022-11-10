@@ -27,7 +27,6 @@ public class ArgumentParser {
                     break;
                 case "--revoke":
                     shouldRevoke = true;
-
                     break;
             }
         }
