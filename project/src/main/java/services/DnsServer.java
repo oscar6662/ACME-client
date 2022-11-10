@@ -39,11 +39,11 @@ public class DnsServer extends Thread{
                 response.setHeader(header);
                 response.addRecord(request.getQuestion(), Section.QUESTION);
                 if (type == Type.A) {
+                    System.out.println(resultForAQuery);
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge, Name.root), Section.ANSWER);
                 }
-                System.out.println(response);
 
                 byte[] responseBytes = response.toWire(256);
                 DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length, packet.getAddress(), packet.getPort());

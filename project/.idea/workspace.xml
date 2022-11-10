@@ -5,9 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_36.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_nop_2_0_3.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_2_0_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/acme.iml" beforeDir="false" afterPath="$PROJECT_DIR$/acme.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/services/Dns01Challenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/Dns01Challenge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/services/DnsServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/DnsServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/services/Http01Challenge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/Http01Challenge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/services/requestSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/requestSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/AcmeFunctions.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/AcmeFunctions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/ArgumentParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/ArgumentParser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/Dns01Challenge.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/Dns01Challenge.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/DnsServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/DnsServer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/Http01Challenge.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/Http01Challenge.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/services/requestSender.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/requestSender.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Utils.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +73,7 @@
     <configuration name="main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main" />
       <module name="acme" />
-      <option name="PROGRAM_PARAMETERS" value="http01 --dir https://localhost:14000/dir --record 127.0.0.1 --domain netsec.ethz.ch" />
+      <option name="PROGRAM_PARAMETERS" value="dns01 --dir https://localhost:14000/dir --record 127.17.0.1 --domain netsec.ethz.ch --revoke" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

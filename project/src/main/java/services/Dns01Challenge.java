@@ -13,18 +13,22 @@ import static utils.Utils.sha256hash;
 
 
 public class Dns01Challenge {
-    private static String DNSServerAddress;
-    public Dns01Challenge(String DNSServerAddress) {
-        Dns01Challenge.DNSServerAddress = DNSServerAddress;
+    public DnsServer server;
+
+    public Dns01Challenge(String DNSServerAddress) throws SocketException {
+        System.out.println(DNSServerAddress);
+        server = new DnsServer(10053, DNSServerAddress);
     }
-    public static void startDnsChallenge(KeyStuff ks) throws NoSuchAlgorithmException, SocketException {
+    public void startDnsChallenge(KeyStuff ks) throws NoSuchAlgorithmException, SocketException {
         PublicKey pk = ks.getPair().getPublic();
         String toEncode = ks.getDns01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        DnsServer server = new DnsServer(10053, DNSServerAddress);
         server.setTextChallenge(Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
         server.start();
     }
-    public static byte[] thumbprint(PublicKey pk) throws NoSuchAlgorithmException {
+    public void shutTheServerDown() {
+        server.stopServer();
+    }
+    public byte[] thumbprint(PublicKey pk) throws NoSuchAlgorithmException {
         String template = "{\"crv\":\"%s\",\"kty\":\"EC\",\"x\":\"%s\",\"y\":\"%s\"}";
         Object crv = "P-256";
         Object x = Base64.encodeBase64URLSafeString(((ECPublicKey) pk).getQ().getAffineXCoord().getEncoded());

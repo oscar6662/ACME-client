@@ -15,19 +15,19 @@ public class ArgumentParser {
             switch (arguments[i]) {
                 case "--dir":
                     ACMEServerDirectory = arguments[++i];
-                    i++;
+
                     break;
                 case "--record":
                     DNSServerAddress = arguments[++i];
-                    i++;
+
                     break;
                 case "--domain":
                     domainList.add(arguments[++i]);
-                    i++;
+
                     break;
                 case "--revoke":
                     shouldRevoke = true;
-                    i++;
+
                     break;
             }
         }

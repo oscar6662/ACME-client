@@ -5,30 +5,19 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public class Utils {
     public static byte[] convertDerToConcatenated(byte derEncodedBytes[], int outputLength) throws IOException
     {
-
-        if (derEncodedBytes.length < 8 || derEncodedBytes[0] != 48)
-        {
-            throw new IOException("Invalid format of ECDSA signature");
-        }
-
         int offset;
-        if (derEncodedBytes[1] > 0)
-        {
+        if (derEncodedBytes[1] > 0) {
             offset = 2;
-        }
-        else if (derEncodedBytes[1] == (byte) 0x81)
-        {
+        } else if (derEncodedBytes[1] == (byte) 0x81) {
             offset = 3;
         }
-        else
-        {
+        else {
             throw new IOException("Invalid format of ECDSA signature");
         }
 
@@ -90,5 +79,4 @@ public class Utils {
             return null;
         }
     }
-
 }

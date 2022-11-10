@@ -3,24 +3,28 @@ package services;
 import joseObjects.KeyStuff;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
-
 import java.io.IOException;
-import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import static utils.Utils.sha256hash;
 
 
 public class Http01Challenge {
+    private ChallengeHttpServer server;
 
-    public static void startHttpChallenge(KeyStuff ks) throws NoSuchAlgorithmException, IOException {
+    public Http01Challenge() {
+        server = new ChallengeHttpServer(5002);
+    }
+
+    public void startHttpChallenge(KeyStuff ks) throws NoSuchAlgorithmException, IOException {
         PublicKey pk = ks.getPair().getPublic();
         String toEncode = ks.getHttp01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        ChallengeHttpServer server = new ChallengeHttpServer(5002);
         server.setTextChallenge(toEncode);
         server.start();
+    }
+    public void shutTheServerDown(){
+        server.stop();
     }
     public static byte[] thumbprint(PublicKey pk) throws NoSuchAlgorithmException {
         String template = "{\"crv\":\"%s\",\"kty\":\"EC\",\"x\":\"%s\",\"y\":\"%s\"}";

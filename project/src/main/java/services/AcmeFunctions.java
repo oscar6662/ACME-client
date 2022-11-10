@@ -24,14 +24,12 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.IDN;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-
 import static utils.Utils.*;
 import joseObjects.Nonce;
 
@@ -44,13 +42,15 @@ public class AcmeFunctions {
     private requestSender rs;
     private KeyStuff ks;
     private Gson gson;
-    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    private String challengeType;
+    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, SocketException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
         NEW_ORDER_URL = newOrderUrl;
         rs = new requestSender(DNSServerAddress);
         ks = new KeyStuff();
         gson = new Gson();
+        this.challengeType =challengeType;
     }
 
     public KeyStuff getKs() {
@@ -253,6 +253,12 @@ public class AcmeFunctions {
         keyManagerFactory.init(store, "something".toCharArray());
         certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
         certificateHTTPSServer.start();
-        if(shouldRevoke) certificateHTTPSServer.stop();
+        if(shouldRevoke){
+            certificateHTTPSServer.stop();
+            if (challengeType.equals("dns01"))
+                rs.dc.shutTheServerDown();
+            else if (challengeType.equals("http01"))
+                rs.httpc.shutTheServerDown();
+        }
   }
 }

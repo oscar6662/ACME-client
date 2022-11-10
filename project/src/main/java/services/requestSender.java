@@ -14,6 +14,7 @@ import javax.json.JsonReader;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -23,9 +24,9 @@ import java.security.cert.CertificateFactory;
 import java.util.Scanner;
 
 public class requestSender {
-    Dns01Challenge dc;
-    Http01Challenge httpc;
-    public requestSender(String DNSServerAddress) {
+    public Dns01Challenge dc;
+    public Http01Challenge httpc;
+    public requestSender(String DNSServerAddress) throws SocketException {
         dc = new Dns01Challenge(DNSServerAddress);
         httpc = new Http01Challenge();
     }
