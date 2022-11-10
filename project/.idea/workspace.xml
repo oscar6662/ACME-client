@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/ArgumentParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/services/ShutdownHttpServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/ShutdownHttpServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/services/ArgumentParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/services/ArgumentParser.class" afterDir="false" />
-    </list>
+    <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,7 +50,7 @@
     <configuration name="main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main" />
       <module name="acme" />
-      <option name="PROGRAM_PARAMETERS" value="dns01 --dir https://localhost:14000/dir --record 127.17.0.1 --domain netsec.ethz.ch" />
+      <option name="PROGRAM_PARAMETERS" value="dns01 --dir https://localhost:14000/dir --record 127.17.0.1 --domain netsec.ethz.ch --domain example.com" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

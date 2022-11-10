@@ -93,6 +93,7 @@ public class AcmeFunctions {
         byte[] by = gson.toJson(p).getBytes("UTF-8");
 
         Payload.PayloadforNewOrder pn = new Payload.PayloadforNewOrder(identifiers);
+        System.out.println(gson.toJson(pn));
         byte[] bz = gson.toJson(pn).getBytes("UTF-8");
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));

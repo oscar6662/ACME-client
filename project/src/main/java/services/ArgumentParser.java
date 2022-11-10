@@ -19,11 +19,9 @@ public class ArgumentParser {
                     break;
                 case "--record":
                     DNSServerAddress = arguments[++i];
-
                     break;
                 case "--domain":
                     domainList.add(arguments[++i]);
-
                     break;
                 case "--revoke":
                     shouldRevoke = true;
