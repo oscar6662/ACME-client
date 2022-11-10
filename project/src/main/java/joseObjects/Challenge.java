@@ -5,6 +5,7 @@ public class Challenge {
     private String url;
     private String token;
     private String status;
+    private String domain;
     public Challenge(String type, String url, String token, String status) {
         this.type = type;
         this.url = url;
@@ -26,5 +27,12 @@ public class Challenge {
 
     public String getUrl() {
         return url;
+    }
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 }

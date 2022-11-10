@@ -10,17 +10,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static utils.Utils.sha256hash;
 
 public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
-    private String textChallenge;
+    private Map<String, String> map = new HashMap<>();
     public ChallengeHttpServer(int port) {
         super(port);
     }
 
-    public void setTextChallenge(String textChallenge) {
-        this.textChallenge = textChallenge;
+    public void setTextChallenge(String a, String b) {
+        this.map.put(a, b);
     }
     @Override
     public void run() {
@@ -32,10 +35,12 @@ public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
     }
     @Override
     public Response serve(IHTTPSession session) {
-        System.out.println("response:");
-        Response r = newFixedLengthResponse(textChallenge);
-        System.out.println(r);
-        r.addHeader("Content-Type", "application/octet-stream");
-        return r;
+        if (!map.get(session.getUri()).isBlank()) {
+            Response r = newFixedLengthResponse(map.get(session.getUri()));
+            r.addHeader("Content-Type", "application/octet-stream");
+            return r;
+        }else {
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, "not found", "");
+        }
     }
 }

@@ -21,16 +21,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class requestSender {
     public Dns01Challenge dc;
     public Http01Challenge httpc;
-    public requestSender(String DNSServerAddress) throws SocketException {
+    public requestSender(String DNSServerAddress) throws IOException {
         dc = new Dns01Challenge(DNSServerAddress);
         httpc = new Http01Challenge();
     }
-    public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation) throws IOException {
+    public void sendPost(String getUrl, String jws, Nonce nonce, KeyStuff ks, String motivation, boolean...multiple) throws IOException {
         URL url = new URL(getUrl);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -82,7 +84,12 @@ public class requestSender {
                     JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
                     JsonObject jObj = jsonReader.readObject();
                     ks.setFinalizeUrl(jObj.getString("finalize"));
-                    ks.setAuthz(jObj.getJsonArray("authorizations").getString(0));
+                    javax.json.JsonArray authorizations = jObj.getJsonArray("authorizations");
+                    List<String> authroizationList= new ArrayList<>();
+                    for (int i =0; i<authorizations.size();i++) {
+                        authroizationList.add(authorizations.getString(i));
+                    }
+                    ks.setAuthz(authroizationList);
                     ks.setSecondLocation(connection.getHeaderField("Location"));
                 }
                 if (motivation.equals("finalizeOrder")) {
@@ -115,18 +122,20 @@ public class requestSender {
                     for (int i = 0; i <ja.size(); i++) {
                         String challengeType = ja.get(i).getAsJsonObject().get("type").toString();
                         Challenge challenge = gson.fromJson(ja.get(i).toString(), Challenge.class);
+                        String domain =jObj.get("identifier").getAsJsonObject().get("value").toString();
+                        String cleanDomain = domain.substring(1, domain.length() - 1);
+                        challenge.setDomain(cleanDomain);
                         switch (challengeType) {
                             case "\"http-01\"":
-                                System.out.println(challenge.getType()+challenge.getToken());
                                 ks.setHttp01(challenge);
-                                httpc.startHttpChallenge(ks);
+                                httpc.startHttpChallenge(ks, cleanDomain);
                                 break;
                             case "\"tls-alpn-01\"":
                                 ks.setTlsAlpn01(challenge);
                                 break;
                             case "\"dns-01\"":
                                 ks.setDns01(challenge);
-                                dc.startDnsChallenge(ks);
+                                dc.startDnsChallenge(ks, cleanDomain);
                                 break;
                             default:
                                 System.out.println("shit challenge");

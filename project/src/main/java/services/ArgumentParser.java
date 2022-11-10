@@ -8,6 +8,7 @@ public class ArgumentParser {
     public String ACMEServerDirectory;
     public String DNSServerAddress;
     public List<String> domainList = new ArrayList<>();
+    public boolean multipleDomains = false;
     public boolean shouldRevoke;
     public ArgumentParser(String[] arguments) {
         challengeType = arguments[0];
@@ -28,5 +29,6 @@ public class ArgumentParser {
                     break;
             }
         }
+        if (domainList.size() >1) multipleDomains = true;
     }
 }

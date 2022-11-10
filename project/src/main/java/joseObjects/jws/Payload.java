@@ -16,12 +16,9 @@ public class Payload {
 
         public PayloadforNewOrder(List<String> identifiers) {
             this.identifiers = new Identifier[identifiers.size()];
-
-            for(int i = 0; i < identifiers.size(); i++){
-                System.out.println(identifiers.get(i));
+            for(int i = 0; i < identifiers.size(); i++)
                 this.identifiers[i] = new Identifier("dns", identifiers.get(i));
 
-            }
         }
     }
     public static class PayloadToFinalizeOrder {

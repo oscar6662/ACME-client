@@ -5,6 +5,8 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static utils.Utils.GenerateKeys;
 
@@ -12,10 +14,10 @@ public class KeyStuff {
     private KeyPair pair;
     private String location;
     private String finalizeUrl;
-    private String authz;
+    private List<String> authz;
     private Challenge tlsAlpn01;
-    private Challenge dns01;
-    private Challenge http01;
+    private List<Challenge> dns01 = new ArrayList<>();
+    private List<Challenge> http01 = new ArrayList<>();
     private String certificateUrl;
     private boolean authStatus = false;
     private String secondLocation;
@@ -24,6 +26,22 @@ public class KeyStuff {
 
     public KeyStuff() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
          pair = GenerateKeys();
+    }
+    public int getIndexforDns(String domain) {
+        for (int i = 0;i<dns01.size(); i++) {
+            if (dns01.get(i).getDomain().equals(domain)){
+                return i;
+            }
+        }
+        return -1;
+    }
+    public int getIndexforhttp(String domain) {
+        for (int i = 0;i<http01.size(); i++) {
+            if (http01.get(i).getDomain().equals(domain)){
+                return i;
+            }
+        }
+        return -1;
     }
 
     public KeyPair getPair() {
@@ -46,19 +64,19 @@ public class KeyStuff {
         return finalizeUrl;
     }
 
-    public String getAuthz() {
+    public List<String> getAuthz() {
         return authz;
     }
 
-    public void setAuthz(String authz) {
+    public void setAuthz(List<String> authz) {
         this.authz = authz;
     }
 
-    public Challenge getDns01() {
+    public List<Challenge> getDns01() {
         return dns01;
     }
 
-    public Challenge getHttp01() {
+    public List<Challenge> getHttp01() {
         return http01;
     }
 
@@ -67,11 +85,11 @@ public class KeyStuff {
     }
 
     public void setDns01(Challenge dns01) {
-        this.dns01 = dns01;
+        this.dns01.add(dns01);
     }
 
     public void setHttp01(Challenge http01) {
-        this.http01 = http01;
+        this.http01.add(http01);
     }
 
     public void setTlsAlpn01(Challenge tlsAlpn01) {

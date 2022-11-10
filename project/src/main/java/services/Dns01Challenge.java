@@ -9,6 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
+
 import static utils.Utils.sha256hash;
 
 
@@ -16,14 +19,15 @@ public class Dns01Challenge {
     public DnsServer server;
 
     public Dns01Challenge(String DNSServerAddress) throws SocketException {
-        System.out.println(DNSServerAddress);
         server = new DnsServer(10053, DNSServerAddress);
-    }
-    public void startDnsChallenge(KeyStuff ks) throws NoSuchAlgorithmException, SocketException {
-        PublicKey pk = ks.getPair().getPublic();
-        String toEncode = ks.getDns01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        server.setTextChallenge(Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
         server.start();
+    }
+    public void startDnsChallenge(KeyStuff ks, String domain) throws NoSuchAlgorithmException, SocketException {
+        PublicKey pk = ks.getPair().getPublic();
+        int i = ks.getIndexforDns(domain);
+        String toEncode = ks.getDns01().get(i).getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
+        server.setTextChallenge("_acme-challenge."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
+
     }
     public void shutTheServerDown() {
         server.stopServer();

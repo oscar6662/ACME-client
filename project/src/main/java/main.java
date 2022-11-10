@@ -16,7 +16,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import services.AcmeFunctions;
 import services.ArgumentParser;
-import services.ShutdownHttpServer;
 
 public class main {
     // different certificate be used depending on machine it's running
@@ -124,10 +123,29 @@ public class main {
     private static void getTheCertificate(ArgumentParser ap, AcmeFunctions af) throws IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidAlgorithmParameterException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException {
         af.newAccount();
         af.newOrder(ap.domainList);
-        af.newAuthz();
-
-        if (ap.challengeType.equals("dns01")) af.dns01();
-        else if (ap.challengeType.equals("http01")) af.http01();
+        if (ap.multipleDomains) {
+            for(int i = 0; i< ap.domainList.size(); i++) {
+                af.newAuthz(i);
+            }
+        } else {
+            af.newAuthz(0);
+        }
+        if (ap.challengeType.equals("dns01")){
+            if (ap.multipleDomains) {
+                for(int i = 0; i< ap.domainList.size(); i++)
+                    af.dns01(i);
+            } else {
+                af.dns01(0);
+            }
+        }
+        else if (ap.challengeType.equals("http01")){
+            if (ap.multipleDomains) {
+                for(int i = 0; i< ap.domainList.size(); i++)
+                    af.http01(i, ap.multipleDomains);
+            } else {
+                af.http01(0, false);
+            }
+        }
 
         int counter = 0;
         while (!af.getKs().isReady() && counter <10) {

@@ -6,15 +6,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DnsServer extends Thread{
     private final DatagramSocket socket;
     private final String resultForAQuery;
-    private String textChallenge;
+    private Map<String, String> textChallenge = new HashMap<>();
     private volatile boolean running = true;
 
     public DnsServer(int port, String DNSServerAddress) throws SocketException {
@@ -39,11 +38,13 @@ public class DnsServer extends Thread{
                 response.setHeader(header);
                 response.addRecord(request.getQuestion(), Section.QUESTION);
                 if (type == Type.A) {
-                    System.out.println(resultForAQuery);
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
-                    response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge, Name.root), Section.ANSWER);
-                }
+                    System.out.println(request.getQuestion().getName());
+                    if (textChallenge.get(request.getQuestion().getName().toString()) != null){
+                    if (!textChallenge.get(request.getQuestion().getName().toString()).isBlank())
+                        response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge.get(request.getQuestion().getName().toString()), Name.root), Section.ANSWER);
+                }}
 
                 byte[] responseBytes = response.toWire(256);
                 DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length, packet.getAddress(), packet.getPort());
@@ -55,8 +56,8 @@ public class DnsServer extends Thread{
         socket.close();
     }
 
-    public void setTextChallenge(String textChallenge) throws NoSuchAlgorithmException {
-        this.textChallenge = textChallenge;
+    public void setTextChallenge(String a, String b) throws NoSuchAlgorithmException {
+        this.textChallenge.put(a, b);
     }
 
     public void stopServer() {

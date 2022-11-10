@@ -8,20 +8,23 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Http01Challenge {
     private ChallengeHttpServer server;
 
-    public Http01Challenge() {
+    public Http01Challenge() throws IOException {
         server = new ChallengeHttpServer(5002);
+        server.start();
     }
 
-    public void startHttpChallenge(KeyStuff ks) throws NoSuchAlgorithmException, IOException {
+    public void startHttpChallenge(KeyStuff ks, String domain) throws NoSuchAlgorithmException, IOException {
         PublicKey pk = ks.getPair().getPublic();
-        String toEncode = ks.getHttp01().getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        server.setTextChallenge(toEncode);
-        server.start();
+        int i = ks.getIndexforhttp(domain);
+        String toEncode = ks.getHttp01().get(i).getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
+        server.setTextChallenge("/.well-known/acme-challenge/"+ks.getHttp01().get(i).getToken(), toEncode);
     }
     public void shutTheServerDown(){
         server.stop();
