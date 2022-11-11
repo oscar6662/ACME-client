@@ -267,7 +267,6 @@ public class AcmeFunctions {
             try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(join))) {
                 certificate = certificateFactory.generateCertificate(certificateStream);
             }
-
             certificates.add(certificate);
         }
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
