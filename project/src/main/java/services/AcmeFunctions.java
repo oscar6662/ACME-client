@@ -253,9 +253,10 @@ public class AcmeFunctions {
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
     public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
-         certificateHTTPSServer = new CertificateHTTPSServer(5001);
+        certificateHTTPSServer = new CertificateHTTPSServer(5001);
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
         store.load(null, "something".toCharArray());
+        System.out.println(ks.getCertificate());
         store.setKeyEntry("main", ks.getPair().getPrivate(), "something".toCharArray(), ks.getCertificate());
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, "something".toCharArray());
