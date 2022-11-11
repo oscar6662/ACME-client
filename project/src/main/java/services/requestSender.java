@@ -4,31 +4,21 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import joseObjects.Challenge;
-import joseObjects.Jws;
-import joseObjects.KeyStuff;
+import utils.KeyStuff;
 import joseObjects.Nonce;
-import joseObjects.jws.Protected;
-import org.apache.commons.codec.binary.Base64;
+import services.dns.Dns01Challenge;
+import services.http.Http01Challenge;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
-import static utils.Utils.convertDerToConcatenated;
-import static utils.Utils.serialize;
 
 public class requestSender {
     public Dns01Challenge dc;
@@ -60,9 +50,7 @@ public class requestSender {
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-                StringBuilder firstCertificate = new StringBuilder();
-                StringBuilder secondCertificate = new StringBuilder();
-                boolean which = true;
+
                 List<List<String>> certificateLines = new ArrayList<>();
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
@@ -123,7 +111,6 @@ public class requestSender {
                 if (motivation.equals("newAuthz")) {
                     com.google.gson.JsonObject jObj = new JsonParser().parse(new StringReader(sb.toString())).getAsJsonObject();
                     Gson gson = new Gson();
-                    System.out.println(jObj);
                     JsonArray ja = jObj.getAsJsonArray("challenges");
                     for (int i = 0; i <ja.size(); i++) {
                         String challengeType = ja.get(i).getAsJsonObject().get("type").toString();

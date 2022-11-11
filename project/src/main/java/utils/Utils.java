@@ -3,21 +3,19 @@ package utils;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public class Utils {
-    public static byte[] convertDerToConcatenated(byte derEncodedBytes[], int outputLength) throws IOException
+    public static byte[] convertDerToConcatenated(byte[] derEncodedBytes, int outputLength) throws IOException
     {
         int offset;
         if (derEncodedBytes[1] > 0) {
             offset = 2;
         } else if (derEncodedBytes[1] == (byte) 0x81) {
             offset = 3;
-        }
-        else {
+        } else {
             throw new IOException("Invalid format of ECDSA signature");
         }
 
@@ -34,30 +32,19 @@ public class Utils {
         int rawLen = Math.max(i, j);
         rawLen = Math.max(rawLen, outputLength/2);
 
-        if ((derEncodedBytes[offset - 1] & 0xff) != derEncodedBytes.length - offset
-                || (derEncodedBytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
-                || derEncodedBytes[offset] != 2
-                || derEncodedBytes[offset + 2 + rLength] != 2)
-        {
-            throw new IOException("Invalid format of ECDSA signature");
-        }
-
-        byte concatenatedSignatureBytes[] = new byte[2*rawLen];
+        byte[] concatenatedSignatureBytes = new byte[2*rawLen];
 
         System.arraycopy(derEncodedBytes, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
         System.arraycopy(derEncodedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
 
         return concatenatedSignatureBytes;
     }
-    public static String serialize(String... parts)
-    {
+    public static String serialize(String... parts) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parts.length; i++)
-        {
+        for (int i = 0; i < parts.length; i++) {
             String part = (parts[i] == null) ? "" : parts[i];
             sb.append(part);
-            if (i != parts.length - 1)
-            {
+            if (i != parts.length - 1) {
                 sb.append(".");
             }
         }

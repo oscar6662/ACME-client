@@ -1,4 +1,6 @@
-package joseObjects;
+package utils;
+
+import joseObjects.Challenge;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;

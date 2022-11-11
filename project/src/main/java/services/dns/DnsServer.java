@@ -1,4 +1,4 @@
-package services;
+package services.dns;
 import org.xbill.DNS.*;
 
 import java.io.IOException;
