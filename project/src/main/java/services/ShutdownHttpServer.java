@@ -6,8 +6,8 @@ import java.io.IOException;
 
 public class ShutdownHttpServer extends NanoHTTPD implements Runnable {
     private requestSender rs;
-    private NanoHTTPD cs;
-    public ShutdownHttpServer(int port, requestSender rs, NanoHTTPD cs) {
+        private CertificateHTTPSServer cs;
+    public ShutdownHttpServer(int port, requestSender rs, CertificateHTTPSServer cs) {
         super(port);
         this.rs = rs;
         this.cs = cs;
@@ -26,7 +26,7 @@ public class ShutdownHttpServer extends NanoHTTPD implements Runnable {
         if ("/shutdown".equals(session.getUri())) {
             rs.dc.shutTheServerDown();
             rs.httpc.shutTheServerDown();
-            cs.stop();
+            //cs.stop();
            System.exit(0);
         }
         return newFixedLengthResponse("ACME Client Shutdown");

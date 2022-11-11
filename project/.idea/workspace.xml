@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="dbeb788c-84fb-4103-a339-799155efd436" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/AcmeFunctions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/services/CertificateHTTPSServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/CertificateHTTPSServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/services/ShutdownHttpServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/services/ShutdownHttpServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -52,7 +52,7 @@ public class AcmeFunctions {
     private KeyStuff ks;
     private Gson gson;
     private String challengeType;
-    private NanoHTTPD certificateHTTPSServer;
+    private CertificateHTTPSServer certificateHTTPSServer;
     public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType, String revokeCertUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
@@ -269,16 +269,8 @@ public class AcmeFunctions {
             Certificate certificate1 = getCertificate(join);
             certificates.add(certificate1);
         }
-        certificateHTTPSServer = new CertificateHTTPSServer(5001);
-
-        KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-        char[] password = "maria".toCharArray();
-        store.load(null, password);
-        store.setKeyEntry("main", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(store, password);
-        //certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
-        certificateHTTPSServer.start();
+        certificateHTTPSServer = new CertificateHTTPSServer(ks, certificates);
+        new Thread(certificateHTTPSServer).start();
         if(shouldRevoke){
             revokeCert();
         }
