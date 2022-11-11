@@ -26,7 +26,11 @@ public class Dns01Challenge {
         PublicKey pk = ks.getPair().getPublic();
         int i = ks.getIndexforDns(domain);
         String toEncode = ks.getDns01().get(i).getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
-        server.setTextChallenge("_acme-challenge."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
+        if (ks.getDns01().get(i).isWildcard()){
+            server.setTextChallenge("_acme-challenge.*."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
+
+        } else
+            server.setTextChallenge("_acme-challenge."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
 
     }
     public void shutTheServerDown() {

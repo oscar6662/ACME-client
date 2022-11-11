@@ -125,6 +125,11 @@ public class requestSender {
                         String domain =jObj.get("identifier").getAsJsonObject().get("value").toString();
                         String cleanDomain = domain.substring(1, domain.length() - 1);
                         challenge.setDomain(cleanDomain);
+                        if (jObj.get("identifier").getAsJsonObject().get("wildcard") != null) {
+                            String wildcard =jObj.get("identifier").getAsJsonObject().get("wildcard").toString();
+                            challenge.setWildcard(wildcard.equals("true"));
+                        }
+
                         switch (challengeType) {
                             case "\"http-01\"":
                                 ks.setHttp01(challenge);

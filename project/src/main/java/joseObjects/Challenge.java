@@ -6,6 +6,7 @@ public class Challenge {
     private String token;
     private String status;
     private String domain;
+    private boolean wildcard = false;
     public Challenge(String type, String url, String token, String status) {
         this.type = type;
         this.url = url;
@@ -34,5 +35,13 @@ public class Challenge {
 
     public void setDomain(String domain) {
         this.domain = domain;
+    }
+
+    public boolean isWildcard() {
+        return wildcard;
+    }
+
+    public void setWildcard(boolean wildcard) {
+        this.wildcard = wildcard;
     }
 }
