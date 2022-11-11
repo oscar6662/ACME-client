@@ -285,7 +285,7 @@ public class AcmeFunctions {
   public void revokeCert() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
       Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
       ecdsaSign.initSign(ks.getPair().getPrivate());
-      Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), NEW_ORDER_URL);
+      Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), REVOKE_CERT_URL);
       byte[] by = gson.toJson(p).getBytes("UTF-8");
       List<String> certificates = ks.getCertificate().stream().map(l -> String.join("", l)).toList();
       String certificate0 = certificates.get(0);
