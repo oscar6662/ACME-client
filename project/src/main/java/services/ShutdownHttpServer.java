@@ -6,8 +6,8 @@ import java.io.IOException;
 
 public class ShutdownHttpServer extends NanoHTTPD implements Runnable {
     private requestSender rs;
-    private CertificateHTTPSServer cs;
-    public ShutdownHttpServer(int port, requestSender rs, CertificateHTTPSServer cs) {
+    private NanoHTTPD cs;
+    public ShutdownHttpServer(int port, requestSender rs, NanoHTTPD cs) {
         super(port);
         this.rs = rs;
         this.cs = cs;

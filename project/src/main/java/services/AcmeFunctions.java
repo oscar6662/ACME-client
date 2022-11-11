@@ -52,7 +52,7 @@ public class AcmeFunctions {
     private KeyStuff ks;
     private Gson gson;
     private String challengeType;
-    private CertificateHTTPSServer certificateHTTPSServer;
+    private NanoHTTPD certificateHTTPSServer;
     public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType, String revokeCertUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
@@ -263,27 +263,34 @@ public class AcmeFunctions {
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
     public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException, KeyManagementException, SignatureException, NoSuchProviderException, InvalidKeyException {
-        certificateHTTPSServer = new CertificateHTTPSServer(5001);
         List<Certificate> certificates = new ArrayList<>();
         for (List<String> l : ks.getCertificate()) {
             String join = String.join("", l);
-            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(join))) {
-                certificates.add(certificateFactory.generateCertificate(certificateStream));
-            }
+            Certificate certificate1 = getCertificate(join);
+            certificates.add(certificate1);
         }
+        certificateHTTPSServer = new CertificateHTTPSServer(5001);
+
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
         char[] password = "maria".toCharArray();
         store.load(null, password);
-        store.setKeyEntry("adal", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
+        store.setKeyEntry("main", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, password);
-        certificateHTTPSServer.setServerSocketFactory(new NanoHTTPD.SecureServerSocketFactory(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory), null));
+        //certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
         certificateHTTPSServer.start();
         if(shouldRevoke){
             revokeCert();
         }
   }
+    private  Certificate getCertificate(String certificateString) throws CertificateException, IOException {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        Certificate certificate = null;
+        try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(certificateString))) {
+            certificate = certificateFactory.generateCertificate(certificateStream);
+        }
+        return certificate;
+    }
   public void revokeCert() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
       Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
       ecdsaSign.initSign(ks.getPair().getPrivate());
