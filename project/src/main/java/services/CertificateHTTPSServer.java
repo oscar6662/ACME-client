@@ -18,7 +18,7 @@ public class CertificateHTTPSServer extends NanoHTTPD implements Runnable{
 
     @Override
     public Response serve(IHTTPSession session) {
-        return newFixedLengthResponse("Sæææælir");
+        return newFixedLengthResponse("Sæææækluir");
     }
 
     @Override

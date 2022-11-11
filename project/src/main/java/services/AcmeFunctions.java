@@ -26,6 +26,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import static utils.Utils.*;
 import joseObjects.Nonce;
 
@@ -44,15 +47,17 @@ public class AcmeFunctions {
     private Nonce nonce;
     private String NEW_ACCOUNT_URL;
     private String NEW_ORDER_URL;
+    private String REVOKE_CERT_URL;
     private requestSender rs;
     private KeyStuff ks;
     private Gson gson;
     private String challengeType;
     private CertificateHTTPSServer certificateHTTPSServer;
-    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType, String revokeCertUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
         NEW_ORDER_URL = newOrderUrl;
+        REVOKE_CERT_URL = revokeCertUrl;
         rs = new requestSender(DNSServerAddress);
         ks = new KeyStuff();
         gson = new Gson();
@@ -257,22 +262,20 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
-    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException, KeyManagementException {
+    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException, KeyManagementException, SignatureException, NoSuchProviderException, InvalidKeyException {
         certificateHTTPSServer = new CertificateHTTPSServer(5001);
         List<Certificate> certificates = new ArrayList<>();
         for (List<String> l : ks.getCertificate()) {
             String join = String.join("", l);
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            Certificate certificate;
             try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(join))) {
-                certificate = certificateFactory.generateCertificate(certificateStream);
+                certificates.add(certificateFactory.generateCertificate(certificateStream));
             }
-            certificates.add(certificate);
         }
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-        char[] password = "password".toCharArray();
+        char[] password = "maria".toCharArray();
         store.load(null, password);
-        store.setKeyEntry("pebble", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
+        store.setKeyEntry("adal", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, password);
         certificateHTTPSServer.setServerSocketFactory(new NanoHTTPD.SecureServerSocketFactory(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory), null));
@@ -281,7 +284,25 @@ public class AcmeFunctions {
             revokeCert();
         }
   }
-  public void revokeCert() {
+  public void revokeCert() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+      Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
+      ecdsaSign.initSign(ks.getPair().getPrivate());
+      Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), NEW_ORDER_URL);
+      byte[] by = gson.toJson(p).getBytes("UTF-8");
+      List<String> certificates = ks.getCertificate().stream().map(l -> String.join("", l)).toList();
+      String certificate0 = certificates.get(0);
+      String certificate0urlEncoded = Base64.encodeBase64URLSafeString(Base64.decodeBase64((certificate0.getBytes(StandardCharsets.UTF_8))));
+      Payload.PayloadToRevoke pr = new Payload.PayloadToRevoke(certificate0urlEncoded);
+      byte[] bz = gson.toJson(pr).getBytes("UTF-8");
+      String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));
+      ecdsaSign.update(baba.getBytes("UTF-8"));
+
+      byte[] signature = ecdsaSign.sign();
+      byte[] formatsign = convertDerToConcatenated(signature, 16);
+      Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),Base64.encodeBase64URLSafeString(bz), Base64.encodeBase64URLSafeString(formatsign));
+
+      String jwsString = gson.toJson(jws);
+      rs.sendPost(NEW_ORDER_URL, jwsString, nonce, ks, "revokeCert");
 
   }
 }

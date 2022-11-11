@@ -28,4 +28,11 @@ public class Payload {
             this.csr = csr;
         }
     }
+    public static class PayloadToRevoke {
+        public String certificate;
+
+        public PayloadToRevoke(String certificate) {
+            this.certificate = certificate;
+        }
+    }
 }

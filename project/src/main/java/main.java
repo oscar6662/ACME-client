@@ -23,6 +23,7 @@ public class main {
     private static final boolean DEV = false;
     private static String NEW_ORDER_URL;
     private static String NEW_ACCOUNT_URL;
+    private static String REVOKE_CERT_URL;
     private static Nonce nonce;
     private static ArgumentParser ap;
     private static AcmeFunctions af;
@@ -31,7 +32,7 @@ public class main {
         initialization();
         ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
-        af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress, ap.challengeType);
+        af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress, ap.challengeType, REVOKE_CERT_URL);
         getTheCertificate(ap, af);
     }
 
@@ -77,7 +78,7 @@ public class main {
                 certificate = certificateFactory.generateCertificate(certificateStream);
             }
             KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-            char[] password = "password".toCharArray();
+            char[] password = "maria".toCharArray();
             store.load(null, password);
             store.setCertificateEntry("pebble", certificate);
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -111,6 +112,8 @@ public class main {
                 nonce = new Nonce(jObj.getString("newNonce"));
                 NEW_ORDER_URL =  jObj.getString("newOrder");
                 NEW_ACCOUNT_URL =  jObj.getString("newAccount");
+                REVOKE_CERT_URL = jObj.getString("revokeCert");
+
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
