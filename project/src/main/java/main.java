@@ -113,7 +113,6 @@ public class main {
                 NEW_ORDER_URL =  jObj.getString("newOrder");
                 NEW_ACCOUNT_URL =  jObj.getString("newAccount");
                 REVOKE_CERT_URL = jObj.getString("revokeCert");
-
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -129,23 +128,17 @@ public class main {
         if (ap.multipleDomains) {
             for(int i = 0; i< ap.domainList.size(); i++) {
                 af.newAuthz(i);
+                if (ap.challengeType.equals("dns01")){
+                    af.dns01(i);
+                }else if (ap.challengeType.equals("http01")){
+                    af.http01(i, false);
+                }
             }
         } else {
             af.newAuthz(0);
-        }
-        if (ap.challengeType.equals("dns01")){
-            if (ap.multipleDomains) {
-                for(int i = 0; i< ap.domainList.size(); i++)
-                    af.dns01(i);
-            } else {
+            if (ap.challengeType.equals("dns01")){
                 af.dns01(0);
-            }
-        }
-        else if (ap.challengeType.equals("http01")){
-            if (ap.multipleDomains) {
-                for(int i = 0; i< ap.domainList.size(); i++)
-                    af.http01(i, ap.multipleDomains);
-            } else {
+            }else if (ap.challengeType.equals("http01")){
                 af.http01(0, false);
             }
         }

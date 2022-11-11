@@ -300,7 +300,7 @@ public class AcmeFunctions {
       Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),Base64.encodeBase64URLSafeString(bz), Base64.encodeBase64URLSafeString(formatsign));
 
       String jwsString = gson.toJson(jws);
-      rs.sendPost(NEW_ORDER_URL, jwsString, nonce, ks, "revokeCert");
+      rs.sendPost(REVOKE_CERT_URL, jwsString, nonce, ks, "revokeCert");
 
   }
 }
