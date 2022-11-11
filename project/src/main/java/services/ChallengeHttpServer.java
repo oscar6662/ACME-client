@@ -1,12 +1,23 @@
-package services.Http;
+package services;
 
 import fi.iki.elonen.NanoHTTPD;
+import joseObjects.KeyStuff;
+import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jce.interfaces.ECPublicKey;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static utils.Utils.sha256hash;
+
 public class ChallengeHttpServer extends NanoHTTPD implements Runnable {
-    private final Map<String, String> map = new HashMap<>();
+    private Map<String, String> map = new HashMap<>();
     public ChallengeHttpServer(int port) {
         super(port);
     }

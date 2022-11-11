@@ -1,4 +1,4 @@
-package services.Dns;
+package services;
 import org.xbill.DNS.*;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class DnsServer extends Thread{
     private Map<String, String> textChallenge = new HashMap<>();
     private volatile boolean running = true;
 
-    public DnsServer(String DNSServerAddress) throws SocketException {
+    public DnsServer(int port, String DNSServerAddress) throws SocketException {
         this.socket = new DatagramSocket(new InetSocketAddress(10053));
         resultForAQuery = DNSServerAddress;
     }
@@ -40,10 +40,12 @@ public class DnsServer extends Thread{
                 if (type == Type.A) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
+                    System.out.println(request.getQuestion().getName());
                     if (textChallenge.get(request.getQuestion().getName().toString()) != null){
                     if (!textChallenge.get(request.getQuestion().getName().toString()).isBlank())
                         response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge.get(request.getQuestion().getName().toString()), Name.root), Section.ANSWER);
                 }}
+                System.out.println(response);
                 byte[] responseBytes = response.toWire(256);
                 DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length, packet.getAddress(), packet.getPort());
                 socket.send(responsePacket);
@@ -54,7 +56,7 @@ public class DnsServer extends Thread{
         socket.close();
     }
 
-    public void setTextChallenge(String a, String b) {
+    public void setTextChallenge(String a, String b) throws NoSuchAlgorithmException {
         this.textChallenge.clear();
         this.textChallenge.put(a, b);
     }

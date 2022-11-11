@@ -16,6 +16,7 @@ public class ArgumentParser {
             switch (arguments[i]) {
                 case "--dir":
                     ACMEServerDirectory = arguments[++i];
+
                     break;
                 case "--record":
                     DNSServerAddress = arguments[++i];
