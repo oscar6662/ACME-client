@@ -134,9 +134,25 @@ public class AcmeFunctions {
 
             String jwsString = gson.toJson(jws);
             rs.sendPost(ks.getAuthz().get(i), jwsString, nonce, ks, "newAuthz");
-
-
     }
+    public void authzCheck(int i) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
+        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
+        ecdsaSign.initSign(ks.getPair().getPrivate());
+
+        Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getAuthz().get(i));
+        byte[] by = gson.toJson(p).getBytes("UTF-8");
+
+        String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
+        ecdsaSign.update(baba.getBytes("UTF-8"));
+
+        byte[] signature = ecdsaSign.sign();
+        byte[] formatsign = convertDerToConcatenated(signature, 16);
+        Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),"", Base64.encodeBase64URLSafeString(formatsign));
+
+        String jwsString = gson.toJson(jws);
+        rs.sendPost(ks.getAuthz().get(i), jwsString, nonce, ks, "authzCheck");
+    }
+
     public void dns01(int i) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());

@@ -40,12 +40,12 @@ public class DnsServer extends Thread{
                 if (type == Type.A) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
-                    System.out.println(request);
+                    System.out.println(request.getQuestion().getName());
                     if (textChallenge.get(request.getQuestion().getName().toString()) != null){
                     if (!textChallenge.get(request.getQuestion().getName().toString()).isBlank())
                         response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge.get(request.getQuestion().getName().toString()), Name.root), Section.ANSWER);
                 }}
-
+                System.out.println(response);
                 byte[] responseBytes = response.toWire(256);
                 DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length, packet.getAddress(), packet.getPort());
                 socket.send(responsePacket);
@@ -57,6 +57,7 @@ public class DnsServer extends Thread{
     }
 
     public void setTextChallenge(String a, String b) throws NoSuchAlgorithmException {
+        this.textChallenge.clear();
         this.textChallenge.put(a, b);
     }
 

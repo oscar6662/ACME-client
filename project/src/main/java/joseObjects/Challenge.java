@@ -44,4 +44,7 @@ public class Challenge {
     public void setWildcard(boolean wildcard) {
         this.wildcard = wildcard;
     }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

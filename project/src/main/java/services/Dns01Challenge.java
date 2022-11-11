@@ -23,11 +23,12 @@ public class Dns01Challenge {
         server.start();
     }
     public void startDnsChallenge(KeyStuff ks, String domain, boolean wildcard) throws NoSuchAlgorithmException, SocketException {
+        System.out.println("here"+domain+ " "+wildcard);
         PublicKey pk = ks.getPair().getPublic();
         int i = ks.getIndexforDns(domain, wildcard);
         String toEncode = ks.getDns01().get(i).getToken()+"."+Base64.encodeBase64URLSafeString(thumbprint(pk));
         if (wildcard){
-            server.setTextChallenge("_acme-challenge.*."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
+            server.setTextChallenge("_acme-challenge."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
         } else
             server.setTextChallenge("_acme-challenge."+ks.getDns01().get(i).getDomain()+".",Base64.encodeBase64URLSafeString(sha256hash(toEncode)));
     }

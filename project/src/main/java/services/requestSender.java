@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import joseObjects.Challenge;
+import joseObjects.Jws;
 import joseObjects.KeyStuff;
 import joseObjects.Nonce;
+import joseObjects.jws.Protected;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.json.Json;
@@ -17,13 +19,16 @@ import java.lang.reflect.Array;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import static utils.Utils.convertDerToConcatenated;
+import static utils.Utils.serialize;
 
 public class requestSender {
     public Dns01Challenge dc;
@@ -92,6 +97,12 @@ public class requestSender {
                     ks.setFinalizeUrl(jObj.getString("finalize"));
 
                 }
+                if (motivation.equals("authzCheck")) {
+                    JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
+                    JsonObject jObj = jsonReader.readObject();
+                    if (jObj.get("status").equals("valid"))
+                        ks.getDns01().get(0).setStatus("valid");
+                }
                 if (motivation.equals("statusCheck")) {
                     JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
                     JsonObject jObj = jsonReader.readObject();
@@ -112,6 +123,7 @@ public class requestSender {
                 if (motivation.equals("newAuthz")) {
                     com.google.gson.JsonObject jObj = new JsonParser().parse(new StringReader(sb.toString())).getAsJsonObject();
                     Gson gson = new Gson();
+                    System.out.println(jObj);
                     JsonArray ja = jObj.getAsJsonArray("challenges");
                     for (int i = 0; i <ja.size(); i++) {
                         String challengeType = ja.get(i).getAsJsonObject().get("type").toString();
@@ -129,6 +141,7 @@ public class requestSender {
                             case "\"http-01\"":
                                 ks.setHttp01(challenge);
                                 httpc.startHttpChallenge(ks, cleanDomain);
+
                                 break;
                             case "\"tls-alpn-01\"":
                                 ks.setTlsAlpn01(challenge);
@@ -156,5 +169,4 @@ public class requestSender {
             }
         }
     }
-
 }

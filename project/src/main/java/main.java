@@ -125,11 +125,17 @@ public class main {
     private static void getTheCertificate(ArgumentParser ap, AcmeFunctions af) throws IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidAlgorithmParameterException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException, KeyManagementException {
         af.newAccount();
         af.newOrder(ap.domainList);
+        int counter = 0;
         if (ap.multipleDomains) {
             for(int i = 0; i< ap.domainList.size(); i++) {
                 af.newAuthz(i);
                 if (ap.challengeType.equals("dns01")){
                     af.dns01(i);
+                    while (!af.getKs().getDns01().get(0).getStatus().equals("valid") && counter <10) {
+                        Thread.sleep(1000);
+                        af.authzCheck(0);
+                        counter++;
+                    }
                 }else if (ap.challengeType.equals("http01")){
                     af.http01(i, false);
                 }
@@ -143,7 +149,7 @@ public class main {
             }
         }
 
-        int counter = 0;
+        counter = 0;
         while (!af.getKs().isReady() && counter <10) {
             Thread.sleep(1000);
             af.checkStatus();
