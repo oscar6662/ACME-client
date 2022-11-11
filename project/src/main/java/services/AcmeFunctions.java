@@ -23,12 +23,17 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.IDN;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.Certificate;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 import java.util.List;
 import static utils.Utils.*;
 import joseObjects.Nonce;
@@ -252,16 +257,29 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
-    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException {
         certificateHTTPSServer = new CertificateHTTPSServer(5001);
+        List<Certificate> certificates = new ArrayList<>();
+        for (List<String> l : ks.getCertificate()) {
+            String join = String.join("", l);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            Certificate certificate = null;
+            try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(join))) {
+                certificate = certificateFactory.generateCertificate(certificateStream);
+            }
+
+            certificates.add(certificate);
+        }
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-        store.load(null, "something".toCharArray());
-        System.out.println(ks.getCertificate());
-        store.setKeyEntry("main", ks.getPair().getPrivate(), "something".toCharArray(), ks.getCertificate());
+        char[] password = "maria".toCharArray();
+        store.load(null, password);
+        store.setKeyEntry("main", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(store, "something".toCharArray());
+        keyManagerFactory.init(store, password);
         certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
+
         certificateHTTPSServer.start();
+
         if(shouldRevoke){
             revokeCert();
         }

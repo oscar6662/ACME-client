@@ -21,15 +21,15 @@ public class KeyStuff {
     private String certificateUrl;
     private boolean authStatus = false;
     private String secondLocation;
-    private Certificate[] certificate;
+    private List<List<String>>  certificate;
     private boolean ready = false;
 
     public KeyStuff() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
          pair = GenerateKeys();
     }
-    public int getIndexforDns(String domain) {
+    public int getIndexforDns(String domain, boolean wildcard) {
         for (int i = 0;i<dns01.size(); i++) {
-            if (dns01.get(i).getDomain().equals(domain)){
+            if (dns01.get(i).getDomain().equals(domain) && wildcard == dns01.get(i).isWildcard()){
                 return i;
             }
         }
@@ -120,11 +120,11 @@ public class KeyStuff {
         this.secondLocation = secondLocation;
     }
 
-    public void setCertificate(Certificate[] certificate) {
+    public void setCertificate(List<List<String>>  certificate) {
         this.certificate = certificate;
     }
 
-    public Certificate[] getCertificate() {
+    public List<List<String>>  getCertificate() {
         return certificate;
     }
 

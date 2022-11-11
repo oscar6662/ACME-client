@@ -40,7 +40,7 @@ public class DnsServer extends Thread{
                 if (type == Type.A) {
                     response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.A, DClass.IN, 300, resultForAQuery, Name.root), Section.ANSWER);
                 } else if (type == Type.TXT) {
-                    System.out.println(request.getQuestion().getName());
+                    System.out.println(request);
                     if (textChallenge.get(request.getQuestion().getName().toString()) != null){
                     if (!textChallenge.get(request.getQuestion().getName().toString()).isBlank())
                         response.addRecord(org.xbill.DNS.Record.fromString(request.getQuestion().getName(), Type.TXT, DClass.IN, 300, textChallenge.get(request.getQuestion().getName().toString()), Name.root), Section.ANSWER);

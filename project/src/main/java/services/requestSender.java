@@ -58,17 +58,15 @@ public class requestSender {
                 StringBuilder firstCertificate = new StringBuilder();
                 StringBuilder secondCertificate = new StringBuilder();
                 boolean which = true;
+                List<List<String>> certificateLines = new ArrayList<>();
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                     if (motivation.equals("cert")){
-                            if (!line.equals("-----BEGIN CERTIFICATE-----") && !line.equals("-----END CERTIFICATE-----") ) {
-                                if (which)firstCertificate.append(line);
-                                else secondCertificate.append(line);
-                            }
-                            if (line.equals("-----END CERTIFICATE-----"))
-                            {
-                                which=false;
-                            }
+                        if (line.toLowerCase().contains("begin certificate")) {
+                            certificateLines.add(new ArrayList<>());
+                        } else if (!line.toLowerCase().contains("end certificate")) {
+                            certificateLines.get(certificateLines.size() - 1).add(line);
+                        }
                     }
                 }
                 if (motivation.equals("cert")) {
@@ -76,7 +74,7 @@ public class requestSender {
                     Certificate[] certificates = new Certificate[2];
                     certificates[0] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(firstCertificate.toString())));
                     certificates[1] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(secondCertificate.toString())));
-                    ks.setCertificate(certificates);
+                    ks.setCertificate(certificateLines);
                 }
 
                 br.close();
@@ -125,11 +123,12 @@ public class requestSender {
                         String domain =jObj.get("identifier").getAsJsonObject().get("value").toString();
                         String cleanDomain = domain.substring(1, domain.length() - 1);
                         challenge.setDomain(cleanDomain);
-                        if (jObj.get("identifier").getAsJsonObject().get("wildcard") != null) {
-                            String wildcard =jObj.get("identifier").getAsJsonObject().get("wildcard").toString();
+                        boolean wcard = false;
+                        if (jObj.get("wildcard") != null) {
+                            String wildcard =jObj.get("wildcard").toString();
                             challenge.setWildcard(wildcard.equals("true"));
+                            wcard = wildcard.equals("true");
                         }
-
                         switch (challengeType) {
                             case "\"http-01\"":
                                 ks.setHttp01(challenge);
@@ -140,7 +139,7 @@ public class requestSender {
                                 break;
                             case "\"dns-01\"":
                                 ks.setDns01(challenge);
-                                dc.startDnsChallenge(ks, cleanDomain);
+                                dc.startDnsChallenge(ks, cleanDomain, wcard);
                                 break;
                             default:
                                 System.out.println("shit challenge");
