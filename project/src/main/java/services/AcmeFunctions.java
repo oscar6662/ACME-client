@@ -50,6 +50,7 @@ public class AcmeFunctions {
     private String REVOKE_CERT_URL;
     private requestSender rs;
     private KeyStuff ks;
+    private KeyStuff ks2;
     private Gson gson;
     private String challengeType;
     private CertificateHTTPSServer certificateHTTPSServer;
@@ -189,7 +190,7 @@ public class AcmeFunctions {
         rs.sendPost(ks.getTlsAlpn01().getUrl(), jwsString, nonce, ks, "tls01");
     }
     public void finalizeOrder(List<String> identifiers) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, OperatorCreationException, SignatureException, InvalidAlgorithmParameterException {
-        KeyStuff ks2 = new KeyStuff();
+        ks2 = new KeyStuff();
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());
         GeneralName[] gns = new GeneralName[identifiers.size()];
@@ -202,8 +203,6 @@ public class AcmeFunctions {
         X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
         for(int i = 0; i<identifiers.size(); i++)
             namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifiers.get(i).trim().toLowerCase()));
-        System.out.println("finalizeee");
-        System.out.println(namebuilder);
         PKCS10CertificationRequestBuilder p10Builder =
                 new JcaPKCS10CertificationRequestBuilder(namebuilder.build(), ks2.getPair().getPublic());
         ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();
@@ -269,7 +268,7 @@ public class AcmeFunctions {
             Certificate certificate1 = getCertificate(join);
             certificates.add(certificate1);
         }
-        certificateHTTPSServer = new CertificateHTTPSServer(ks, certificates);
+        certificateHTTPSServer = new CertificateHTTPSServer(ks2, certificates);
         new Thread(certificateHTTPSServer).start();
         if(shouldRevoke){
             revokeCert();
