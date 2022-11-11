@@ -1,13 +1,13 @@
-package joseObjects;
+package utils;
+
+import joseObjects.Challenge;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
 import static utils.Utils.GenerateKeys;
 
 public class KeyStuff {
@@ -85,7 +85,6 @@ public class KeyStuff {
     }
 
     public void setDns01(Challenge dns01) {
-        System.out.println("maria"+dns01.getDomain()+dns01.getToken());
         this.dns01.add(dns01);
     }
 

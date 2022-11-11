@@ -10,7 +10,6 @@ import java.util.Base64;
 import java.util.List;
 import javax.json.*;
 import javax.net.ssl.*;
-
 import joseObjects.Nonce;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -32,7 +31,7 @@ public class main {
         initialization();
         ap = new ArgumentParser(args);
         acmeInit(ap.ACMEServerDirectory);
-        af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress, ap.challengeType, REVOKE_CERT_URL);
+        af = new AcmeFunctions(nonce, NEW_ACCOUNT_URL, NEW_ORDER_URL, ap.DNSServerAddress, REVOKE_CERT_URL);
         getTheCertificate(ap, af);
     }
 
@@ -122,6 +121,24 @@ public class main {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
+
+    /**
+     *
+     * @param ap Arguments that describe what and how the certificate shall be parsed
+     * @param af Function object
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws SignatureException
+     * @throws NoSuchProviderException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     * @throws OperatorCreationException
+     * @throws InterruptedException
+     * @throws UnrecoverableKeyException
+     * @throws CertificateException
+     * @throws KeyStoreException
+     * @throws KeyManagementException
+     */
     private static void getTheCertificate(ArgumentParser ap, AcmeFunctions af) throws IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidAlgorithmParameterException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException, KeyManagementException {
         af.newAccount();
         af.newOrder(ap.domainList);
@@ -137,7 +154,7 @@ public class main {
                         counter++;
                     }
                 }else if (ap.challengeType.equals("http01")){
-                    af.http01(i, false);
+                    af.http01(i);
                 }
             }
         } else {
@@ -145,7 +162,7 @@ public class main {
             if (ap.challengeType.equals("dns01")){
                 af.dns01(0);
             }else if (ap.challengeType.equals("http01")){
-                af.http01(0, false);
+                af.http01(0);
             }
         }
 

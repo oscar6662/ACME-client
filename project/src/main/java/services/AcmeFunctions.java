@@ -1,10 +1,11 @@
 package services;
 
 import com.google.gson.Gson;
-import fi.iki.elonen.NanoHTTPD;
 import joseObjects.Jwk;
 import joseObjects.Jws;
-import joseObjects.KeyStuff;
+import services.Http.CertificateHttpsServer;
+import services.Http.ShutdownHttpServer;
+import utils.KeyStuff;
 import joseObjects.jws.Payload;
 import joseObjects.jws.Protected;
 import org.apache.commons.codec.binary.Base64;
@@ -23,12 +24,9 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.IDN;
-import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.security.*;
@@ -36,33 +34,27 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import static utils.Utils.*;
 import joseObjects.Nonce;
 
-import javax.net.ssl.*;
-
 public class AcmeFunctions {
-    private Nonce nonce;
-    private String NEW_ACCOUNT_URL;
-    private String NEW_ORDER_URL;
-    private String REVOKE_CERT_URL;
-    private requestSender rs;
-    private KeyStuff ks;
+    private final Nonce nonce;
+    private final String NEW_ACCOUNT_URL;
+    private final String NEW_ORDER_URL;
+    private final String REVOKE_CERT_URL;
+    private final RequestSender rs;
+    private final KeyStuff ks;
     private KeyStuff ks2;
-    private Gson gson;
-    private String challengeType;
-    private CertificateHTTPSServer certificateHTTPSServer;
-    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String challengeType, String revokeCertUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    private final Gson gson;
+    private CertificateHttpsServer certificateHTTPSServer;
+    public AcmeFunctions(Nonce nonce, String newAccUrl, String newOrderUrl, String DNSServerAddress, String revokeCertUrl) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
         this.nonce = nonce;
         NEW_ACCOUNT_URL = newAccUrl;
         NEW_ORDER_URL = newOrderUrl;
         REVOKE_CERT_URL = revokeCertUrl;
-        rs = new requestSender(DNSServerAddress);
+        rs = new RequestSender(DNSServerAddress);
         ks = new KeyStuff();
         gson = new Gson();
-        this.challengeType =challengeType;
         new ShutdownHttpServer(5003, rs, certificateHTTPSServer);
     }
 
@@ -78,17 +70,17 @@ public class AcmeFunctions {
             Jwk jwk = new Jwk("EC", "P-256", Base64.encodeBase64URLSafeString(((ECPublicKey) ks.getPair().getPublic()).getQ().getAffineXCoord().getEncoded()), Base64.encodeBase64URLSafeString(((ECPublicKey) ks.getPair().getPublic()).getQ().getAffineYCoord().getEncoded()));
             Protected p = new Protected("ES256", jwk, nonce.getNonce(), NEW_ACCOUNT_URL);
             String pString = gson.toJson(p);
-            byte[] by = pString.getBytes("UTF-8");
+            byte[] by = pString.getBytes(StandardCharsets.UTF_8);
 
             String [] a = new String[1];
             a[0] = "mailto:something@something.com";
             Payload payload = new Payload(true, a);
 
             String payloadString = gson.toJson(payload);
-            byte[] bz = payloadString.getBytes("UTF-8");
+            byte[] bz = payloadString.getBytes(StandardCharsets.UTF_8);
 
             String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));
-            ecdsaSign.update(baba.getBytes("UTF-8"));
+            ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
             byte[] signature = ecdsaSign.sign();
             byte[] formatsign = convertDerToConcatenated(signature, 16);
             Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),Base64.encodeBase64URLSafeString(bz), Base64.encodeBase64URLSafeString(formatsign));
@@ -101,14 +93,14 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), NEW_ORDER_URL);
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         Payload.PayloadforNewOrder pn = new Payload.PayloadforNewOrder(identifiers);
         System.out.println(gson.toJson(pn));
-        byte[] bz = gson.toJson(pn).getBytes("UTF-8");
+        byte[] bz = gson.toJson(pn).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -123,10 +115,10 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
             Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getAuthz().get(i));
-            byte[] by = gson.toJson(p).getBytes("UTF-8");
+            byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
             String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
-            ecdsaSign.update(baba.getBytes("UTF-8"));
+            ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
             byte[] signature = ecdsaSign.sign();
             byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -140,10 +132,10 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getAuthz().get(i));
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -158,10 +150,10 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getDns01().get(i).getUrl());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString("{}".getBytes(StandardCharsets.UTF_8)));
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -171,39 +163,22 @@ public class AcmeFunctions {
         rs.sendPost(ks.getDns01().get(i).getUrl(), jwsString, nonce, ks, "dns01");
 
     }
-    public void http01(int i, boolean multiple) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
+    public void http01(int i) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getHttp01().get(i).getUrl());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString("{}".getBytes(StandardCharsets.UTF_8)));
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
         Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),Base64.encodeBase64URLSafeString("{}".getBytes(StandardCharsets.UTF_8)), Base64.encodeBase64URLSafeString(formatsign));
 
         String jwsString = gson.toJson(jws);
-        rs.sendPost(ks.getHttp01().get(i).getUrl(), jwsString, nonce, ks, "http01", multiple);
-    }
-    public void tls01() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
-        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", "BC");
-        ecdsaSign.initSign(ks.getPair().getPrivate());
-
-        Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getTlsAlpn01().getUrl());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
-
-        String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString("{}".getBytes(StandardCharsets.UTF_8)));
-        ecdsaSign.update(baba.getBytes("UTF-8"));
-
-        byte[] signature = ecdsaSign.sign();
-        byte[] formatsign = convertDerToConcatenated(signature, 16);
-        Jws jws = new Jws(Base64.encodeBase64URLSafeString(by),Base64.encodeBase64URLSafeString("{}".getBytes(StandardCharsets.UTF_8)), Base64.encodeBase64URLSafeString(formatsign));
-
-        String jwsString = gson.toJson(jws);
-        rs.sendPost(ks.getTlsAlpn01().getUrl(), jwsString, nonce, ks, "tls01");
+        rs.sendPost(ks.getHttp01().get(i).getUrl(), jwsString, nonce, ks, "http01");
     }
     public void finalizeOrder(List<String> identifiers) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, OperatorCreationException, SignatureException, InvalidAlgorithmParameterException {
         ks2 = new KeyStuff();
@@ -213,12 +188,11 @@ public class AcmeFunctions {
         for(int i = 0; i<identifiers.size(); i++)
             gns[i] = new GeneralName(GeneralName.dNSName, identifiers.get(i).trim().toLowerCase());
         GeneralNames subjectAltName = new GeneralNames(gns);
-
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getFinalizeUrl());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
         X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
-        for(int i = 0; i<identifiers.size(); i++)
-            namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifiers.get(i).trim().toLowerCase()));
+        for (String identifier : identifiers)
+            namebuilder.addRDN(BCStyle.CN, IDN.toASCII(identifier.trim().toLowerCase()));
         PKCS10CertificationRequestBuilder p10Builder =
                 new JcaPKCS10CertificationRequestBuilder(namebuilder.build(), ks2.getPair().getPublic());
         ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();
@@ -231,10 +205,10 @@ public class AcmeFunctions {
 
         PKCS10CertificationRequest csr = p10Builder.build(signer);
         Payload.PayloadToFinalizeOrder py = new Payload.PayloadToFinalizeOrder(Base64.encodeBase64URLSafeString(csr.getEncoded()));
-        byte[] bz = gson.toJson(py).getBytes("UTF-8");
+        byte[] bz = gson.toJson(py).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), Base64.encodeBase64URLSafeString(bz));
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -248,10 +222,10 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getSecondLocation());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -265,10 +239,10 @@ public class AcmeFunctions {
         ecdsaSign.initSign(ks.getPair().getPrivate());
 
         Protected p = new Protected("ES256", ks.getLocation(), nonce.getNonce(), ks.getCertificateUrl());
-        byte[] by = gson.toJson(p).getBytes("UTF-8");
+        byte[] by = gson.toJson(p).getBytes(StandardCharsets.UTF_8);
 
         String baba = serialize(Base64.encodeBase64URLSafeString(by), "");
-        ecdsaSign.update(baba.getBytes("UTF-8"));
+        ecdsaSign.update(baba.getBytes(StandardCharsets.UTF_8));
 
         byte[] signature = ecdsaSign.sign();
         byte[] formatsign = convertDerToConcatenated(signature, 16);
@@ -277,14 +251,14 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
-    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException, KeyManagementException, SignatureException, NoSuchProviderException, InvalidKeyException {
+    public void createServer(boolean shouldRevoke) throws IOException, NoSuchAlgorithmException, CertificateException, SignatureException, NoSuchProviderException, InvalidKeyException {
         List<Certificate> certificates = new ArrayList<>();
         for (List<String> l : ks.getCertificate()) {
             String join = String.join("", l);
             Certificate certificate1 = getCertificate(join);
             certificates.add(certificate1);
         }
-        certificateHTTPSServer = new CertificateHTTPSServer(ks2, certificates);
+        certificateHTTPSServer = new CertificateHttpsServer(ks2, certificates);
         new Thread(certificateHTTPSServer).start();
         if(shouldRevoke){
             revokeCert();
@@ -317,6 +291,5 @@ public class AcmeFunctions {
 
       String jwsString = gson.toJson(jws);
       rs.sendPost(REVOKE_CERT_URL, jwsString, nonce, ks, "revokeCert");
-
   }
 }

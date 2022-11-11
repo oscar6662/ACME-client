@@ -1,18 +1,18 @@
-package services;
+package services.Http;
 
 import fi.iki.elonen.NanoHTTPD;
+import services.RequestSender;
 
 import java.io.IOException;
 
 public class ShutdownHttpServer extends NanoHTTPD implements Runnable {
-    private requestSender rs;
-        private CertificateHTTPSServer cs;
-    public ShutdownHttpServer(int port, requestSender rs, CertificateHTTPSServer cs) {
+    private RequestSender rs;
+    private CertificateHttpsServer cs;
+    public ShutdownHttpServer(int port, RequestSender rs, CertificateHttpsServer cs) {
         super(port);
         this.rs = rs;
         this.cs = cs;
     }
-
     @Override
     public void run() {
         try {
@@ -26,7 +26,7 @@ public class ShutdownHttpServer extends NanoHTTPD implements Runnable {
         if ("/shutdown".equals(session.getUri())) {
             rs.dc.shutTheServerDown();
             rs.httpc.shutTheServerDown();
-            //cs.stop();
+            cs.stop();
            System.exit(0);
         }
         return newFixedLengthResponse("ACME Client Shutdown");

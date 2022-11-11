@@ -22,10 +22,6 @@ public class Challenge {
         return token;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public String getUrl() {
         return url;
     }
