@@ -38,7 +38,7 @@ import java.util.List;
 import static utils.Utils.*;
 import joseObjects.Nonce;
 
-import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.*;
 
 public class AcmeFunctions {
     private Nonce nonce;
@@ -257,7 +257,7 @@ public class AcmeFunctions {
         String jwsString = gson.toJson(jws);
         rs.sendPost(ks.getCertificateUrl(), jwsString, nonce, ks, "cert");
     }
-    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException {
+    public void createServer(boolean shouldRevoke) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException, KeyManagementException {
         certificateHTTPSServer = new CertificateHTTPSServer(5001);
         List<Certificate> certificates = new ArrayList<>();
         for (List<String> l : ks.getCertificate()) {
@@ -275,7 +275,7 @@ public class AcmeFunctions {
         store.setKeyEntry("pebble", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, password);
-        certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
+        certificateHTTPSServer.setServerSocketFactory(new NanoHTTPD.SecureServerSocketFactory(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory), null));
         certificateHTTPSServer.start();
         if(shouldRevoke){
             revokeCert();

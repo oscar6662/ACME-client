@@ -85,7 +85,7 @@ public class main {
             TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, null);
-            SSLContext.setDefault(sslContext);
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         }
     }
 
@@ -120,7 +120,7 @@ public class main {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
-    private static void getTheCertificate(ArgumentParser ap, AcmeFunctions af) throws IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidAlgorithmParameterException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException {
+    private static void getTheCertificate(ArgumentParser ap, AcmeFunctions af) throws IOException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidAlgorithmParameterException, OperatorCreationException, InterruptedException, UnrecoverableKeyException, CertificateException, KeyStoreException, KeyManagementException {
         af.newAccount();
         af.newOrder(ap.domainList);
         if (ap.multipleDomains) {
