@@ -271,15 +271,13 @@ public class AcmeFunctions {
             certificates.add(certificate);
         }
         KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-        char[] password = "maria".toCharArray();
+        char[] password = "password".toCharArray();
         store.load(null, password);
-        store.setKeyEntry("main", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
+        store.setKeyEntry("pebble", ks.getPair().getPrivate(), password, certificates.toArray(new Certificate[]{}));
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(store, password);
         certificateHTTPSServer.makeSecure(NanoHTTPD.makeSSLSocketFactory(store, keyManagerFactory.getKeyManagers()), null);
-
         certificateHTTPSServer.start();
-
         if(shouldRevoke){
             revokeCert();
         }

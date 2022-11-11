@@ -70,10 +70,6 @@ public class requestSender {
                     }
                 }
                 if (motivation.equals("cert")) {
-                    CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                    Certificate[] certificates = new Certificate[2];
-                    certificates[0] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(firstCertificate.toString())));
-                    certificates[1] = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(secondCertificate.toString())));
                     ks.setCertificate(certificateLines);
                 }
 
@@ -148,14 +144,14 @@ public class requestSender {
                 // JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()));
                 // JsonObject jObj = jsonReader.readObject();
 
-            } catch (IOException | NoSuchAlgorithmException | CertificateException ioException) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            } catch (IOException | NoSuchAlgorithmException ioException) {
+                /*BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                     System.out.println(line);
-                }
+                }*/
                 ioException.printStackTrace();
             }
         }

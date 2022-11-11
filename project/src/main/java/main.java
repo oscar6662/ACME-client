@@ -85,7 +85,7 @@ public class main {
             TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, null);
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+            SSLContext.setDefault(sslContext);
         }
     }
 
