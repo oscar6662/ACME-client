@@ -263,7 +263,7 @@ public class AcmeFunctions {
         for (List<String> l : ks.getCertificate()) {
             String join = String.join("", l);
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            Certificate certificate = null;
+            Certificate certificate;
             try (ByteArrayInputStream certificateStream = new ByteArrayInputStream(Base64.decodeBase64(join))) {
                 certificate = certificateFactory.generateCertificate(certificateStream);
             }
